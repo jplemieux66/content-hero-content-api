@@ -1,6 +1,6 @@
 service:
-  name: content-hero-upload
-  app: content-hero-upload
+  name: content-hero-api-content
+  app: content-hero-api-content
   org: jeanphilippelemieux66
 
 custom:
@@ -21,15 +21,72 @@ provider:
   runtime: nodejs12.x
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
-  environment:
-    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
   stage: ${env:STAGE}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:DYNAMODB_TABLE}'
 
 functions:
-  hello:
-    handler: handler.hello
+  create:
+    handler: api/create.handler
     events:
       - http:
-          path: hello
+          path: content
           method: post
           cors: true
+
+  list:
+    handler: api/list.handler
+    events:
+      - http:
+          path: content
+          method: get
+          cors: true
+
+  get:
+    handler: api/get.handler
+    events:
+      - http:
+          path: content/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: api/update.handler
+    events:
+      - http:
+          path: content/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: api/delete.handler
+    events:
+      - http:
+          path: content/{id}
+          method: delete
+          cors: true
+
+resources:
+  Resources:
+    ContentDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${env:DYNAMODB_TABLE}
