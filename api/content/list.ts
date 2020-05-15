@@ -3,23 +3,20 @@ import 'source-map-support/register';
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
-import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
-import { DeleteItemInput } from 'aws-sdk/clients/dynamodb';
+import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
-  const params: DeleteItemInput = {
-    TableName: process.env.DYNAMODB_TABLE,
-    Key: {
-      id: event.pathParameters.id,
-    } as any,
+const list: APIGatewayProxyHandler = async (event, _context) => {
+  const params: ScanInput = {
+    TableName: process.env.CONTENT_DYNAMODB_TABLE,
   };
 
+  let result: ScanOutput;
   try {
-    dynamoDb.delete(params).promise();
+    result = await dynamoDb.scan(params).promise();
   } catch (e) {
     console.error(e);
     return {
@@ -31,11 +28,8 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({}),
+    body: JSON.stringify(result.Items),
   };
 };
 
-export const handler = middy(deleteHandler)
-  .use(jsonBodyParser())
-  .use(httpErrorHandler())
-  .use(cors());
+export const handler = middy(list).use(httpErrorHandler()).use(cors());

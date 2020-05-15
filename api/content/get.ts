@@ -11,7 +11,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   const params: GetItemInput = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.CONTENT_DYNAMODB_TABLE,
     Key: {
       id: event.pathParameters.id,
     } as any,

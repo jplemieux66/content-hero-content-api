@@ -1,7 +1,6 @@
-service:
-  name: content-hero-api-content
-  app: content-hero-api-content
-  org: jeanphilippelemieux66
+org: jeanphilippelemieux66
+app: content-hero-api
+service: content-hero-rest-api
 
 custom:
   webpack:
@@ -31,43 +30,44 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:DYNAMODB_TABLE}'
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
 
 functions:
-  create:
-    handler: api/create.handler
+  # Content API
+  content-create:
+    handler: api/content/create.handler
     events:
       - http:
           path: content
           method: post
           cors: true
 
-  list:
-    handler: api/list.handler
+  content-list:
+    handler: api/content/list.handler
     events:
       - http:
           path: content
           method: get
           cors: true
 
-  get:
-    handler: api/get.handler
+  content-get:
+    handler: api/content/get.handler
     events:
       - http:
           path: content/{id}
           method: get
           cors: true
 
-  update:
-    handler: api/update.handler
+  content-update:
+    handler: api/content/update.handler
     events:
       - http:
           path: content/{id}
           method: put
           cors: true
 
-  delete:
-    handler: api/delete.handler
+  content-delete:
+    handler: api/content/delete.handler
     events:
       - http:
           path: content/{id}
@@ -89,4 +89,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${env:DYNAMODB_TABLE}
+        TableName: ${env:CONTENT_DYNAMODB_TABLE}

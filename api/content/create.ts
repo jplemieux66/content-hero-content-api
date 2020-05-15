@@ -17,7 +17,7 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
   const body = event.body as any;
 
   const params: PutItemInput = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.CONTENT_DYNAMODB_TABLE,
     Item: {
       id: uuidv4(),
       createdAt: timestamp,

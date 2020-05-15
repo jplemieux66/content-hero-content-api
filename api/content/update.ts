@@ -16,7 +16,7 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
   const body = event.body as any;
 
   const params: UpdateItemInput = {
-    TableName: process.env.DYNAMODB_TABLE,
+    TableName: process.env.CONTENT_DYNAMODB_TABLE,
     Key: {
       id: event.pathParameters.id,
     } as any,
