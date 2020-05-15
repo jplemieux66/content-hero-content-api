@@ -24,11 +24,12 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
       ':fileName': body.fileName,
       ':fileType': body.fileType,
       ':s3ContentId': body.s3ContentId,
+      ':s3ContentPath': body.s3ContentPath,
       ':userEmail': body.userEmail,
       ':updatedAt': timestamp as any,
     },
     UpdateExpression:
-      'SET fileName = :fileName, fileType = :fileType, s3ContentId = :s3ContentId, userEmail = :userEmail, updatedAt = :updatedAt',
+      'SET fileName = :fileName, fileType = :fileType, s3ContentId = :s3ContentId, s3ContentPath = :s3ContentPath, userEmail = :userEmail, updatedAt = :updatedAt',
     ReturnValues: 'ALL_NEW',
   };
 
@@ -63,6 +64,9 @@ const inputSchema = {
           type: 'string',
         },
         s3ContentId: {
+          type: 'string',
+        },
+        s3ContentPath: {
           type: 'string',
         },
         userEmail: {

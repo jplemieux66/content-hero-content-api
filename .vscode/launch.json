@@ -5,7 +5,7 @@
       "request": "launch",
       "name": "Launch Serverless Offline",
       "program": "${workspaceFolder}/node_modules/serverless/bin/serverless",
-      "args": ["offline", "--noTimeout"],
+      "args": ["offline", "--noTimeout", "--stage", "dev"],
       "sourceMaps": true,
       "runtimeArgs": ["--lazy"],
       "outFiles": ["${workspaceFolder}/.webpack/**/*.js"],

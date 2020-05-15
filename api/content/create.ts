@@ -58,11 +58,20 @@ const inputSchema = {
         s3ContentId: {
           type: 'string',
         },
+        s3ContentPath: {
+          type: 'string',
+        },
         userEmail: {
           type: 'string',
         },
       },
-      required: ['fileName', 'fileType', 's3ContentId', 'userEmail'],
+      required: [
+        'fileName',
+        'fileType',
+        's3ContentId',
+        's3ContentPath',
+        'userEmail',
+      ],
     },
   },
 };
