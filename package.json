@@ -5,8 +5,8 @@
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy:dev": "NODE_ENV=development serverless deploy --stage dev",
-    "deploy:prod": "NODE_ENV=production serverless deploy --stage prod"
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod"
   },
   "dependencies": {
     "@middy/core": "^1.0.0",
