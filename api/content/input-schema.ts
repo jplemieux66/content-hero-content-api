@@ -19,9 +19,6 @@ export const inputSchema = {
         s3ThumbnailPath: {
           type: 'string',
         },
-        userEmail: {
-          type: 'string',
-        },
       },
       required: [
         'fileName',
@@ -29,7 +26,6 @@ export const inputSchema = {
         's3ContentId',
         's3ContentPath',
         's3ThumbnailPath',
-        'userEmail',
       ],
     },
   },

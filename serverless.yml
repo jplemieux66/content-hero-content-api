@@ -31,6 +31,8 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
+  environment:
+    AUTH0_CLIENT_PUBLIC_KEY: ${file(${env:AUTH0_CLIENT_PUBLIC_KEY_PATH})}
 
 functions:
   # Content API
@@ -83,6 +85,8 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: userEmail
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -90,3 +94,13 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${env:CONTENT_DYNAMODB_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: userEmailIndex
+            KeySchema:
+              - AttributeName: userEmail
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1

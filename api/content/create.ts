@@ -9,6 +9,9 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { PutItemInput } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuidv4 } from 'uuid';
+
+import { CustomJWTAuthMiddleware } from '../../utils/custom-jwt-auth-middleware';
+import { getUserEmail } from '../../utils/get-user-email';
 import { inputSchema } from './input-schema';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -16,6 +19,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const create: APIGatewayProxyHandler = async (event, _context) => {
   const timestamp = new Date().getTime();
   const body = event.body as any;
+  const userEmail = getUserEmail(event);
 
   const params: PutItemInput = {
     TableName: process.env.CONTENT_DYNAMODB_TABLE,
@@ -23,6 +27,7 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
       id: uuidv4(),
       createdAt: timestamp,
       updatedAt: timestamp,
+      userEmail,
       ...body,
     },
   };
@@ -48,4 +53,5 @@ export const handler = middy(create)
   .use(jsonBodyParser())
   .use(validator({ inputSchema }))
   .use(httpErrorHandler())
-  .use(cors());
+  .use(cors())
+  .use(CustomJWTAuthMiddleware());
