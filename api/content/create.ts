@@ -9,6 +9,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { PutItemInput } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuidv4 } from 'uuid';
+import { inputSchema } from './input-schema';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -41,39 +42,6 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
     statusCode: 200,
     body: JSON.stringify(params.Item),
   };
-};
-
-const inputSchema = {
-  type: 'object',
-  properties: {
-    body: {
-      type: 'object',
-      properties: {
-        fileName: {
-          type: 'string',
-        },
-        fileType: {
-          type: 'string',
-        },
-        s3ContentId: {
-          type: 'string',
-        },
-        s3ContentPath: {
-          type: 'string',
-        },
-        userEmail: {
-          type: 'string',
-        },
-      },
-      required: [
-        'fileName',
-        'fileType',
-        's3ContentId',
-        's3ContentPath',
-        'userEmail',
-      ],
-    },
-  },
 };
 
 export const handler = middy(create)

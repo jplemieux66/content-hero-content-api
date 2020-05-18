@@ -8,28 +8,35 @@ import validator from '@middy/validator';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { UpdateItemInput, UpdateItemOutput } from 'aws-sdk/clients/dynamodb';
+import { inputSchema } from './input-schema';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const update: APIGatewayProxyHandler = async (event, _context) => {
   const timestamp = new Date().getTime();
+
+  // Parse Body Values
   const body = event.body as any;
 
+  const expressionAttributeValues = {};
+  const updateExpressionStatements = [];
+  Object.keys(inputSchema.properties.body.properties).map((key) => {
+    expressionAttributeValues[`:${key}`] = body[key];
+    updateExpressionStatements.push(`${key} = :${key}`);
+  });
+
+  // Set Updated At
+  expressionAttributeValues[`:updatedAt`] = timestamp;
+  updateExpressionStatements.push(`updatedAt = :updatedAt`);
+
+  // Prepare params for DynamoDb operation
   const params: UpdateItemInput = {
     TableName: process.env.CONTENT_DYNAMODB_TABLE,
     Key: {
       id: event.pathParameters.id,
     } as any,
-    ExpressionAttributeValues: {
-      ':fileName': body.fileName,
-      ':fileType': body.fileType,
-      ':s3ContentId': body.s3ContentId,
-      ':s3ContentPath': body.s3ContentPath,
-      ':userEmail': body.userEmail,
-      ':updatedAt': timestamp as any,
-    },
-    UpdateExpression:
-      'SET fileName = :fileName, fileType = :fileType, s3ContentId = :s3ContentId, s3ContentPath = :s3ContentPath, userEmail = :userEmail, updatedAt = :updatedAt',
+    ExpressionAttributeValues: expressionAttributeValues,
+    UpdateExpression: `SET ${updateExpressionStatements.join(', ')}`,
     ReturnValues: 'ALL_NEW',
   };
 
@@ -49,32 +56,6 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
     statusCode: 200,
     body: JSON.stringify(result.Attributes),
   };
-};
-
-const inputSchema = {
-  type: 'object',
-  properties: {
-    body: {
-      type: 'object',
-      properties: {
-        fileName: {
-          type: 'string',
-        },
-        fileType: {
-          type: 'string',
-        },
-        s3ContentId: {
-          type: 'string',
-        },
-        s3ContentPath: {
-          type: 'string',
-        },
-        userEmail: {
-          type: 'string',
-        },
-      },
-    },
-  },
 };
 
 export const handler = middy(update)
