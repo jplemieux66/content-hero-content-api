@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { inputSchema } from './input-schema';
+import { inputSchema } from './utils/input-schema';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 

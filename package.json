@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
-    "offline": "serverless offline --stage dev"
+    "offline": "serverless offline --printOutput --stage dev"
   },
   "dependencies": {
     "@middy/core": "^1.0.0",

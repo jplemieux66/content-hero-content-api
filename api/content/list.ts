@@ -4,29 +4,20 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import * as AWS from 'aws-sdk';
-import { QueryInput, ScanOutput } from 'aws-sdk/clients/dynamodb';
 
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+import { listContentForEmail } from './utils/dynamodb/list-content-for-email';
 
 const list: APIGatewayProxyHandler = async (event, _context) => {
-  const userEmail = getUserEmail(event);
-
-  const params: QueryInput = {
-    TableName: process.env.CONTENT_DYNAMODB_TABLE,
-    IndexName: 'userEmailIndex',
-    ExpressionAttributeValues: {
-      ':userEmail': userEmail,
-    },
-    KeyConditionExpression: 'userEmail = :userEmail',
-  };
-
-  let result: ScanOutput;
   try {
-    result = await dynamoDb.query(params).promise();
+    const userEmail = getUserEmail(event);
+    const content = listContentForEmail(userEmail);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(content),
+    };
   } catch (e) {
     console.error(e);
     return {
@@ -35,11 +26,6 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
       body: "Couldn't list the items.",
     };
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(result.Items),
-  };
 };
 
 export const handler = middy(list)

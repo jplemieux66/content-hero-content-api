@@ -73,6 +73,14 @@ functions:
           method: put
           cors: true
 
+  content-delete-all:
+    handler: api/content/delete-all.handler
+    events:
+      - http:
+          path: content/all
+          method: delete
+          cors: true
+
   content-delete:
     handler: api/content/delete.handler
     events:
