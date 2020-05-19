@@ -7,7 +7,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { QueryInput, ScanOutput } from 'aws-sdk/clients/dynamodb';
 
-import { CustomJWTAuthMiddleware } from '../../utils/custom-jwt-auth-middleware';
+import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -44,5 +44,5 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
 
 export const handler = middy(list)
   .use(httpErrorHandler())
-  .use(cors())
-  .use(CustomJWTAuthMiddleware());
+  .use(new AuthMiddleware())
+  .use(cors());

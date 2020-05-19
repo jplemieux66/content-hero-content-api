@@ -8,8 +8,8 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import { DeleteItemInput, GetItemInput } from 'aws-sdk/clients/dynamodb';
 
-import { CustomJWTAuthMiddleware } from '../../utils/custom-jwt-auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
+import { AuthMiddleware } from '../../utils/auth-middleware';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -59,5 +59,5 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
 export const handler = middy(deleteHandler)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
-  .use(cors())
-  .use(CustomJWTAuthMiddleware());
+  .use(new AuthMiddleware())
+  .use(cors());

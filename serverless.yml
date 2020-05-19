@@ -30,7 +30,12 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
+      Resource:
+        - 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
+        - Fn::Join:
+            - '/'
+            - - 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
+              - 'index/*'
   environment:
     AUTH0_CLIENT_PUBLIC_KEY: ${file(${env:AUTH0_CLIENT_PUBLIC_KEY_PATH})}
 

@@ -10,7 +10,7 @@ import * as AWS from 'aws-sdk';
 import { PutItemInput } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CustomJWTAuthMiddleware } from '../../utils/custom-jwt-auth-middleware';
+import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { inputSchema } from './input-schema';
 
@@ -53,5 +53,5 @@ export const handler = middy(create)
   .use(jsonBodyParser())
   .use(validator({ inputSchema }))
   .use(httpErrorHandler())
-  .use(cors())
-  .use(CustomJWTAuthMiddleware());
+  .use(new AuthMiddleware())
+  .use(cors());
