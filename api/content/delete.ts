@@ -12,6 +12,7 @@ import { getUserEmail } from '../../utils/get-user-email';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const s3 = new AWS.S3();
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   try {
@@ -24,6 +25,14 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const res = await dynamoDb.get(getParams).promise();
 
+    if (!res.Item) {
+      return {
+        statusCode: 404,
+        headers: { 'Content-Type': 'text/plain' },
+        body: "Couldn't find the item to delete",
+      };
+    }
+
     const userEmail = getUserEmail(event);
     if (res.Item.userEmail !== userEmail) {
       return {
@@ -31,6 +40,26 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
         headers: { 'Content-Type': 'text/plain' },
         body: 'Unauthorized',
       };
+    }
+
+    try {
+      await s3
+        .deleteObjects({
+          Bucket: process.env.S3_BUCKET,
+          Delete: {
+            Objects: [
+              {
+                Key: res.Item.s3ContentPath,
+              },
+              {
+                Key: res.Item.s3ThumbnailPath,
+              },
+            ],
+          },
+        })
+        .promise();
+    } catch (e) {
+      console.error(`Couldn't delete some or all S3 Objects`);
     }
 
     const params: DeleteItemInput = {
