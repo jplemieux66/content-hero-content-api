@@ -46,14 +46,16 @@ const deleteAllHandler: APIGatewayProxyHandler = async (event, _context) => {
       console.error(`Couldn't delete some or all S3 Objects`);
     }
 
-    dynamoIdsToDelete.map((id) => {
-      const params: DeleteItemInput = {
-        TableName: process.env.CONTENT_DYNAMODB_TABLE,
-        Key: { id },
-      };
+    await Promise.all(
+      dynamoIdsToDelete.map((id) => {
+        const params: DeleteItemInput = {
+          TableName: process.env.CONTENT_DYNAMODB_TABLE,
+          Key: { id },
+        };
 
-      dynamoDb.delete(params).promise();
-    });
+        return dynamoDb.delete(params).promise();
+      }),
+    );
   } catch (e) {
     console.error(e);
     return {
