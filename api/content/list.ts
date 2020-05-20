@@ -12,7 +12,7 @@ import { listContentForEmail } from './utils/dynamodb/list-content-for-email';
 const list: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const userEmail = getUserEmail(event);
-    const content = listContentForEmail(userEmail);
+    const content = await listContentForEmail(userEmail);
 
     return {
       statusCode: 200,
