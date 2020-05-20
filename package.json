@@ -8,7 +8,7 @@
     "test:watch": "jest --watch --runInBand",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
-    "offline": "serverless offline --printOutput --stage dev"
+    "offline": "serverless offline --printOutput --stage dev --httpPort 3000 --lambdaPort 3002"
   },
   "jest": {
     "testEnvironment": "node",
