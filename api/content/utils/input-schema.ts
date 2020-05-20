@@ -13,10 +13,10 @@ export const inputSchema = {
         s3ContentId: {
           type: 'string',
         },
-        s3ContentPath: {
+        s3ContentURL: {
           type: 'string',
         },
-        s3ThumbnailPath: {
+        s3ThumbnailURL: {
           type: 'string',
         },
       },
@@ -24,8 +24,8 @@ export const inputSchema = {
         'fileName',
         'fileType',
         's3ContentId',
-        's3ContentPath',
-        's3ThumbnailPath',
+        's3ContentURL',
+        's3ThumbnailURL',
       ],
     },
   },
