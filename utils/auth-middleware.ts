@@ -4,10 +4,7 @@ import middy from '@middy/core';
 import jwt, { NotBeforeError, TokenExpiredError } from 'jsonwebtoken';
 
 export class AuthMiddleware {
-  public before: middy.MiddlewareFunction<any, any> = async (
-    { event },
-    next,
-  ) => {
+  public before: middy.MiddlewareFunction<any, any> = async ({ event }) => {
     const token = this.getTokenFromAuthHeader(event);
 
     try {
@@ -31,7 +28,6 @@ export class AuthMiddleware {
 
     const payload = jwt.decode(token);
     event.auth = { payload: payload as any, token };
-    next();
   };
 
   private getTokenFromAuthHeader(

@@ -6,7 +6,6 @@ jest.mock('jsonwebtoken', () => ({
   decode: jest.fn(),
 }));
 const mockedJwt = (jwt as any) as { verify: jest.Mock; decode: jest.Mock };
-const next = jest.fn().mockImplementation(() => {});
 
 describe('Auth Middleware', () => {
   test('Should set auth properties on event', async () => {
@@ -21,14 +20,13 @@ describe('Auth Middleware', () => {
     mockedJwt.decode.mockImplementation(() => ({}));
 
     // Act
-    await auth.before({ event: event as any } as any, next);
+    await auth.before({ event: event as any } as any, undefined);
 
     // Assert
     expect(event['auth']).toMatchObject({
       payload: {},
       token: 'token',
     });
-    expect(next).toHaveBeenCalled();
   });
 
   test('Should throw error if Authorization header is not set', async () => {
@@ -38,7 +36,7 @@ describe('Auth Middleware', () => {
 
     // Act
     try {
-      await auth.before({ event: event as any } as any, next);
+      await auth.before({ event: event as any } as any, undefined);
     } catch (e) {
       // Assert
       expect(e).not.toBeUndefined();
@@ -59,7 +57,7 @@ describe('Auth Middleware', () => {
 
     // Act
     try {
-      await auth.before({ event: event as any } as any, next);
+      await auth.before({ event: event as any } as any, undefined);
     } catch (e) {
       expect(e).not.toBeUndefined();
       return;
@@ -82,12 +80,7 @@ describe('Auth Middleware', () => {
 
     // Act
     try {
-      await auth.before(
-        {
-          event: event as any,
-        } as any,
-        next,
-      );
+      await auth.before({ event: event as any } as any, undefined);
     } catch (e) {
       expect(e).not.toBeUndefined();
       return;
@@ -110,12 +103,7 @@ describe('Auth Middleware', () => {
 
     // Act
     try {
-      await auth.before(
-        {
-          event: event as any,
-        } as any,
-        next,
-      );
+      await auth.before({ event: event as any } as any, undefined);
     } catch (e) {
       expect(e).not.toBeUndefined();
       return;
