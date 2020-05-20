@@ -4,7 +4,8 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "test": "jest --watch --runInBand",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch --runInBand",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
     "offline": "serverless offline --printOutput --stage dev"
