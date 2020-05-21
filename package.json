@@ -4,7 +4,7 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest --group=unit --runInBand",
     "test:watch": "jest --watch --runInBand",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
@@ -14,7 +14,8 @@
     "testEnvironment": "node",
     "transform": {
       ".(ts|tsx)": "ts-jest"
-    }
+    },
+    "runner": "groups"
   },
   "dependencies": {
     "@middy/core": "^1.0.0",
@@ -38,6 +39,7 @@
     "@types/uuid": "^7.0.3",
     "fork-ts-checker-webpack-plugin": "^3.0.1",
     "jest": "^26.0.1",
+    "jest-runner-groups": "^2.0.1",
     "serverless": "^1.70.1",
     "serverless-offline": "^6.1.5",
     "serverless-webpack": "^5.2.0",

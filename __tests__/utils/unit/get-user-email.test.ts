@@ -1,4 +1,10 @@
-import { getUserEmail } from '../../utils/get-user-email';
+/**
+ * Tests GetUserEmail function
+ *
+ * @group unit
+ */
+
+import { getUserEmail } from '../../../utils/get-user-email';
 
 describe('Get User Email Tests', () => {
   test('Should return the email', () => {

@@ -1,4 +1,10 @@
-import { AuthMiddleware } from '../../utils/auth-middleware';
+/**
+ * Tests AuthMiddleware
+ *
+ * @group unit
+ */
+
+import { AuthMiddleware } from '../../../utils/auth-middleware';
 import jwt, { TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
 
 jest.mock('jsonwebtoken', () => ({
