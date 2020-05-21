@@ -19,6 +19,12 @@ export const inputSchema = {
         s3ThumbnailURL: {
           type: 'string',
         },
+        thumbnailWidth: {
+          type: 'number',
+        },
+        thumbnailHeight: {
+          type: 'number',
+        },
       },
       required: [
         'fileName',
@@ -26,6 +32,8 @@ export const inputSchema = {
         's3ContentId',
         's3ContentURL',
         's3ThumbnailURL',
+        'thumbnailWidth',
+        'thumbnailHeight',
       ],
     },
   },
