@@ -20,7 +20,6 @@ provider:
   runtime: nodejs12.x
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
-  stage: ${env:STAGE}
   iamRoleStatements:
     - Effect: Allow
       Action:
