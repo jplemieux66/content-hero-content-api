@@ -16,14 +16,34 @@ export const inputSchema = {
         s3ContentURL: {
           type: 'string',
         },
-        s3ThumbnailURL: {
+        width: {
+          type: 'number',
+        },
+        height: {
+          type: 'number',
+        },
+        duration: {
           type: 'string',
         },
-        thumbnailWidth: {
-          type: 'number',
-        },
-        thumbnailHeight: {
-          type: 'number',
+        thumbnails: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              key: {
+                type: 'string',
+              },
+              url: {
+                type: 'string',
+              },
+              width: {
+                type: 'number',
+              },
+              height: {
+                type: 'number',
+              },
+            },
+          },
         },
       },
       required: [
@@ -31,9 +51,9 @@ export const inputSchema = {
         'fileType',
         's3ContentId',
         's3ContentURL',
-        's3ThumbnailURL',
-        'thumbnailWidth',
-        'thumbnailHeight',
+        'width',
+        'height',
+        'thumbnails',
       ],
     },
   },
