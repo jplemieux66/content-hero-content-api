@@ -1,0 +1,48 @@
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@1.0.0
+executors:
+  node:
+    docker:
+      - image: circleci/node:10
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - deploy_prod:
+          filters:
+            branches:
+              only:
+                - master
+      - deploy_dev:
+          filters:
+            branches:
+              only:
+                - develop
+      # - deploy_test:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - test
+jobs:
+  deploy_prod:
+    executor: node
+    steps:
+      - checkout
+      - run: sudo npm i -g serverless
+      - run: npm install
+      - run: npm run deploy:prod
+  deploy_dev:
+    executor: node
+    steps:
+      - checkout
+      - run: sudo npm i -g serverless
+      - run: npm install
+      - run: npm run deploy:dev
+  # deploy_test:
+  #   executor: node
+  #   steps:
+  #     - checkout
+  #     - run: sudo npm i -g serverless
+  #     - run: npm install
+  #     - run: npm run deploy:test
