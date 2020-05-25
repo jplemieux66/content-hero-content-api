@@ -6,39 +6,33 @@ import httpErrorHandler from '@middy/http-error-handler';
 import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
-import { DeleteItemInput, GetItemInput } from 'aws-sdk/clients/dynamodb';
 
-import { getUserEmail } from '../../utils/get-user-email';
+import { initDatabase } from '../../db/db';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { getUserEmail } from '../../utils/get-user-email';
+import { Content } from './model/content';
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+initDatabase();
 const s3 = new AWS.S3();
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
+  _context.callbackWaitsForEmptyEventLoop = false;
+
   try {
-    const getParams: GetItemInput = {
-      TableName: process.env.CONTENT_DYNAMODB_TABLE,
-      Key: {
-        id: event.pathParameters.id,
-      } as any,
-    };
+    const userEmail = getUserEmail(event);
+    const item = await Content.findOneAndDelete(
+      {
+        _id: event.pathParameters.id,
+        userEmail,
+      },
+      event.body as any,
+    );
 
-    const res = await dynamoDb.get(getParams).promise();
-
-    if (!res.Item) {
+    if (!item) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'text/plain' },
         body: "Couldn't find the item to delete",
-      };
-    }
-
-    const userEmail = getUserEmail(event);
-    if (res.Item.userEmail !== userEmail) {
-      return {
-        statusCode: 401,
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Unauthorized',
       };
     }
 
@@ -49,11 +43,9 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
           Delete: {
             Objects: [
               {
-                Key: res.Item.s3ContentPath,
+                Key: (item as any).s3ContentId,
               },
-              {
-                Key: res.Item.s3ThumbnailPath,
-              },
+              (item as any).thumbnails.map((t) => ({ Key: t.key })),
             ],
           },
         })
@@ -61,21 +53,12 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
     } catch (e) {
       console.error(`Couldn't delete some or all S3 Objects`);
     }
-
-    const params: DeleteItemInput = {
-      TableName: process.env.CONTENT_DYNAMODB_TABLE,
-      Key: {
-        id: event.pathParameters.id,
-      } as any,
-    };
-
-    dynamoDb.delete(params).promise();
   } catch (e) {
     console.error(e);
     return {
       statusCode: e.statusCode || 501,
       headers: { 'Content-Type': 'text/plain' },
-      body: "Couldn't delete the item.",
+      body: e.message || "Couldn't delete the item.",
     };
   }
 

@@ -20,6 +20,7 @@
       "outFiles": ["${workspaceFolder}/.webpack/**/*.js"],
       "protocol": "inspector",
       "runtimeExecutable": "node",
+      "env": { "IS_OFFLINE": "true", "SLS_DEBUG": "*" },
       "windows": {
         "program": "${workspaceFolder}\\node_modules\\serverless\\bin\\serverless"
       }

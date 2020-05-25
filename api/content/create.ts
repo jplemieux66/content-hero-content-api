@@ -4,54 +4,43 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import jsonBodyParser from '@middy/http-json-body-parser';
-import validator from '@middy/validator';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import * as AWS from 'aws-sdk';
-import { PutItemInput } from 'aws-sdk/clients/dynamodb';
-import { v4 as uuidv4 } from 'uuid';
 
+import { initDatabase } from '../../db/db';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { inputSchema } from './utils/input-schema';
+import { Content } from './model/content';
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+initDatabase();
 
 const create: APIGatewayProxyHandler = async (event, _context) => {
-  const timestamp = new Date().getTime();
+  _context.callbackWaitsForEmptyEventLoop = false;
+
   const body = event.body as any;
   const userEmail = getUserEmail(event);
 
-  const params: PutItemInput = {
-    TableName: process.env.CONTENT_DYNAMODB_TABLE,
-    Item: {
-      id: uuidv4(),
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      userEmail,
-      ...body,
-    },
-  };
-
   try {
-    await dynamoDb.put(params).promise();
+    const item = await new Content({
+      ...body,
+      userEmail,
+    });
+    await item.save();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(item),
+    };
   } catch (e) {
-    console.error(e);
+    console.error(e.message || e);
     return {
       statusCode: e.statusCode || 501,
       headers: { 'Content-Type': 'text/plain' },
-      body: "Couldn't create the item.",
+      body: e.message || "Couldn't create the item.",
     };
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify(params.Item),
-  };
 };
 
 export const handler = middy(create)
   .use(jsonBodyParser())
-  .use(validator({ inputSchema }))
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
   .use(cors());

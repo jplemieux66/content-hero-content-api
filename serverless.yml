@@ -20,21 +20,6 @@ provider:
   runtime: nodejs12.x
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
-        - Fn::Join:
-            - '/'
-            - - 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${env:CONTENT_DYNAMODB_TABLE}'
-              - 'index/*'
   environment:
     AUTH0_CLIENT_PUBLIC_KEY: ${file(${env:AUTH0_CLIENT_PUBLIC_KEY_PATH})}
 
@@ -87,32 +72,3 @@ functions:
           path: content/{id}
           method: delete
           cors: true
-
-resources:
-  Resources:
-    ContentDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-          - AttributeName: userEmail
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${env:CONTENT_DYNAMODB_TABLE}
-        GlobalSecondaryIndexes:
-          - IndexName: userEmailIndex
-            KeySchema:
-              - AttributeName: userEmail
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1

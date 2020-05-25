@@ -7,12 +7,19 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { listContentForEmail } from './utils/dynamodb/list-content-for-email';
+import { Content } from './model/content';
+import { initDatabase } from '../../db/db';
+
+initDatabase();
 
 const list: APIGatewayProxyHandler = async (event, _context) => {
+  _context.callbackWaitsForEmptyEventLoop = false;
+
   try {
     const userEmail = getUserEmail(event);
-    const content = await listContentForEmail(userEmail);
+    const content = await Content.find({
+      userEmail,
+    });
 
     return {
       statusCode: 200,
@@ -23,7 +30,7 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
     return {
       statusCode: e.statusCode || 501,
       headers: { 'Content-Type': 'text/plain' },
-      body: "Couldn't list the items.",
+      body: e.message || "Couldn't list the items.",
     };
   }
 };
