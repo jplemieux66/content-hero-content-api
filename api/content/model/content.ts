@@ -21,6 +21,13 @@ const ContentThumbnailSchema = new mongoose.Schema({
 
 const ContentSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
     fileName: {
       type: String,
       required: true,
