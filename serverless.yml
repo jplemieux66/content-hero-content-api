@@ -1,5 +1,5 @@
-org: jeanphilippelemieux66
-app: content-hero-api
+# org: jeanphilippelemieux66
+# app: content-hero-api
 service: content-hero-rest-api
 
 custom:
@@ -21,6 +21,7 @@ provider:
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
   environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     AUTH0_CLIENT_PUBLIC_KEY: ${file(${env:AUTH0_CLIENT_PUBLIC_KEY_PATH})}
 
 functions:
