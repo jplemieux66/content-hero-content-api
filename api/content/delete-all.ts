@@ -25,16 +25,16 @@ const deleteAllHandler: APIGatewayProxyHandler = async (event, _context) => {
     });
 
     const s3KeysToDelete: { Key: string }[] = [];
-    const dynamoIdsToDelete = [];
 
-    content.map((item: any) => {
+    content.map((item) => {
       s3KeysToDelete.push({
-        Key: item.s3ContentPath as string,
+        Key: item.s3ContentId,
       });
-      s3KeysToDelete.push({
-        Key: item.s3ThumbnailPath as string,
+      item.thumbnails.map((t) => {
+        s3KeysToDelete.push({
+          Key: t.key,
+        });
       });
-      dynamoIdsToDelete.push(item.id);
     });
 
     try {

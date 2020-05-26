@@ -43,9 +43,9 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
           Delete: {
             Objects: [
               {
-                Key: (item as any).s3ContentId,
+                Key: item.s3ContentId,
               },
-              (item as any).thumbnails.map((t) => ({ Key: t.key })),
+              ...item.thumbnails.map((t) => ({ Key: t.key })),
             ],
           },
         })
