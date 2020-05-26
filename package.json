@@ -4,10 +4,12 @@
   "description": "Serverless webpack example using Typescript",
   "main": "handler.js",
   "scripts": {
-    "test": "jest --group=unit --runInBand",
+    "test:unit": "jest --group=unit --runInBand",
+    "test:integration": "jest --group=integration --runInBand",
     "test:watch": "jest --watch --runInBand",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
+    "deploy:test": "serverless deploy --stage test",
     "offline": "serverless offline --printOutput --stage dev --httpPort 3000 --lambdaPort 3002"
   },
   "jest": {
