@@ -19,11 +19,11 @@ workflows:
             branches:
               only:
                 - develop
-      # - deploy_test:
-      #     filters:
-      #       branches:
-      #         only:
-      #           - test
+      - deploy_test:
+          filters:
+            branches:
+              only:
+                - test
 jobs:
   deploy_prod:
     executor: node
@@ -39,10 +39,10 @@ jobs:
       - run: sudo npm i -g serverless
       - run: npm install
       - run: npm run deploy:dev
-  # deploy_test:
-  #   executor: node
-  #   steps:
-  #     - checkout
-  #     - run: sudo npm i -g serverless
-  #     - run: npm install
-  #     - run: npm run deploy:test
+  deploy_test:
+    executor: node
+    steps:
+      - checkout
+      - run: sudo npm i -g serverless
+      - run: npm install
+      - run: npm run deploy:test
