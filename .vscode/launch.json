@@ -26,13 +26,28 @@
       }
     },
     {
-      "name": "Debug Jest Tests",
+      "name": "Debug Jest Unit Tests",
       "type": "node",
       "request": "launch",
       "runtimeArgs": [
         "--inspect-brk",
         "${workspaceRoot}/node_modules/.bin/jest",
-        "--runInBand"
+        "--runInBand",
+        "--group=unit"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    },
+    {
+      "name": "Debug Jest Integration Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "--runInBand",
+        "--group=integration"
       ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
