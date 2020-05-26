@@ -20,7 +20,7 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
     const body = event.body as any;
     const userEmail = getUserEmail(event);
 
-    const item = await Content.findOneAndUpdate(
+    let item = await Content.findOneAndUpdate(
       {
         _id: event.pathParameters.id,
         userEmail,
@@ -35,6 +35,8 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
         body: "Couldn't find the item to delete",
       };
     }
+
+    item = await Content.findById(item._id);
 
     return {
       statusCode: 200,
