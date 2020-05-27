@@ -21,6 +21,13 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
       _id: event.pathParameters.id,
       userEmail,
     });
+    if (!content) {
+      return {
+        statusCode: 404,
+        headers: { 'Content-Type': 'text/plain' },
+        body: "Couldn't find the item to delete",
+      };
+    }
     return {
       statusCode: 200,
       body: JSON.stringify(content),
