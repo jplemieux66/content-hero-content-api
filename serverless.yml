@@ -25,6 +25,14 @@ provider:
     AUTH0_CLIENT_PUBLIC_KEY: ${file(${env:AUTH0_CLIENT_PUBLIC_KEY_PATH})}
 
 functions:
+  delete-all:
+    handler: api/delete-all.handler
+    events:
+      - http:
+          path: all
+          method: delete
+          cors: true
+
   # Content API
   content-create:
     handler: api/content/create.handler
@@ -55,15 +63,7 @@ functions:
     events:
       - http:
           path: content/{id}
-          method: put
-          cors: true
-
-  content-delete-all:
-    handler: api/content/delete-all.handler
-    events:
-      - http:
-          path: content/all
-          method: delete
+          method: patch
           cors: true
 
   content-delete:
@@ -71,5 +71,46 @@ functions:
     events:
       - http:
           path: content/{id}
+          method: delete
+          cors: true
+
+  # Tags API
+  tag-create:
+    handler: api/tags/create.handler
+    events:
+      - http:
+          path: tags
+          method: post
+          cors: true
+
+  tags-list:
+    handler: api/tags/list.handler
+    events:
+      - http:
+          path: tags
+          method: get
+          cors: true
+
+  tags-get:
+    handler: api/tags/get.handler
+    events:
+      - http:
+          path: tags/{id}
+          method: get
+          cors: true
+
+  tags-update:
+    handler: api/tags/update.handler
+    events:
+      - http:
+          path: tags/{id}
+          method: patch
+          cors: true
+
+  tags-delete:
+    handler: api/tags/delete.handler
+    events:
+      - http:
+          path: tags/{id}
           method: delete
           cors: true
