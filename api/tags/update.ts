@@ -9,7 +9,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { initDatabase } from '../../db/db';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { Tag } from './model/tag';
+import { Tag } from '../../db/models/tag';
 
 initDatabase();
 

@@ -10,8 +10,8 @@ import * as AWS from 'aws-sdk';
 import { initDatabase } from '../db/db';
 import { AuthMiddleware } from '../utils/auth-middleware';
 import { getUserEmail } from '../utils/get-user-email';
-import { Content } from './content/model/content';
-import { Tag } from './tags/model/tag';
+import { Content } from '../db/models/content';
+import { Tag } from '../db/models/tag';
 
 initDatabase();
 const s3 = new AWS.S3();

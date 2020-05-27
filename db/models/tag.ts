@@ -6,19 +6,22 @@ export interface Tag extends mongoose.Document {
   description: string;
 }
 
-const TagSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const TagSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    userEmail: {
+      type: String,
+      required: true,
+    },
   },
-  description: {
-    type: String,
-  },
-  userEmail: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true },
+);
 
 (global as any).Tag = (global as any).Tag || mongoose.model('Tag', TagSchema);
 

@@ -6,20 +6,25 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 
-import { Content } from '../../api/content/model/content';
-import { initDatabase } from '../../db/db';
+import { Content } from '../../db/models/content';
+import { initDatabase, disconnectDatabase } from '../../db/db';
 import { getToken } from '../_auth/auth';
 
 dotenv.config({ path: 'config/.env.test' });
-initDatabase();
+jest.setTimeout(30000);
 
 let user1Token: string;
 
 beforeAll(async () => {
+  await initDatabase();
   user1Token = await getToken(
     process.env.AUTH0_USER_1_EMAIL,
     process.env.AUTH0_USER_1_PASSWORD,
   );
+});
+
+afterAll(async () => {
+  disconnectDatabase();
 });
 
 describe('POST /content', () => {
