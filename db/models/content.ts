@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 export interface ContentThumbnail {
-  _id: string;
   key: string;
   url: string;
   width: number;
@@ -39,6 +38,7 @@ export interface Content extends mongoose.Document {
   height: number;
   duration: string;
   thumbnails: ContentThumbnail[];
+  tags: string[];
   userEmail: string;
   createdAt: number;
   updatedAt: number;
@@ -86,6 +86,10 @@ const ContentSchema = new mongoose.Schema(
     },
     thumbnails: {
       type: [ContentThumbnailSchema],
+      required: true,
+    },
+    tags: {
+      type: [String],
       required: true,
     },
     userEmail: {
