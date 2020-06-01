@@ -81,7 +81,7 @@ describe('UPDATE /tags/:id', () => {
 
     // Act
     const res = await axios.patch(
-      process.env.API_URL + '/tags/' + initialItem._id,
+      process.env.API_URL + '/tags/' + initialItem._id.toString(),
       { name: newName },
       {
         headers: {
@@ -93,7 +93,7 @@ describe('UPDATE /tags/:id', () => {
 
     // Assert
     await expect(res.status).toBe(200);
-    await expect(item._id).toEqual(initialItem._id);
+    await expect(item._id).toEqual(initialItem._id.toString());
     await expect(item.name).toEqual(newName);
   });
 
@@ -318,14 +318,15 @@ describe('GET /tags/:id', () => {
     await item.save();
 
     // Act
-    const res = await axios.get(process.env.API_URL + '/tags/' + item._id, {
-      headers: {
-        Authorization: `Bearer ${user1Token}`,
-      },
-    });
-
-    // Assert
-    await expect(res.status).toBe(404);
+    try {
+      await axios.get(process.env.API_URL + '/tags/' + item._id, {
+        headers: {
+          Authorization: `Bearer ${user1Token}`,
+        },
+      });
+    } catch (e) {
+      await expect(e.response.status).toBe(404);
+    }
   });
 
   test('Should fail if there is no token', async () => {
