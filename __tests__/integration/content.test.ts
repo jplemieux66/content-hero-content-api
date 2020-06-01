@@ -46,6 +46,7 @@ const getTestContent = () => ({
   width: 100,
   height: 100,
   duration: 30,
+  tags: [],
   thumbnails: [
     {
       key: 'test',
