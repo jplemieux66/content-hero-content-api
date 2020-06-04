@@ -16,7 +16,7 @@ initDatabase();
 
 const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.id;
+  const collectionId = event.pathParameters.collectionId;
 
   try {
     const requestUserEmail = getUserEmail(event);

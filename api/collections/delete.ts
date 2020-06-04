@@ -17,7 +17,7 @@ initDatabase();
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.id;
+  const collectionId = event.pathParameters.collectionId;
 
   try {
     const userEmail = getUserEmail(event);
@@ -26,10 +26,10 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     await Promise.all([
       Collection.deleteOne({
-        _id: event.pathParameters.id,
+        _id: collectionId,
       }),
       CollectionUser.deleteMany({
-        collectionId: event.pathParameters.id,
+        collectionId,
       }),
     ]);
   } catch (e) {

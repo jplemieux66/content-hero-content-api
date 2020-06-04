@@ -136,7 +136,7 @@ functions:
     handler: api/collections/get.handler
     events:
       - http:
-          path: collections/{id}
+          path: collections/{collectionId}
           method: get
           cors: true
 
@@ -144,7 +144,7 @@ functions:
     handler: api/collections/update.handler
     events:
       - http:
-          path: collections/{id}
+          path: collections/{collectionId}
           method: patch
           cors: true
 
@@ -152,7 +152,7 @@ functions:
     handler: api/collections/delete.handler
     events:
       - http:
-          path: collections/{id}
+          path: collections/{collectionId}
           method: delete
           cors: true
 
@@ -160,7 +160,7 @@ functions:
     handler: api/collections/add-user.handler
     events:
       - http:
-          path: collections/{id}/users/
+          path: collections/{collectionId}/users/
           method: post
           cors: true
 
@@ -168,6 +168,6 @@ functions:
     handler: api/collections/remove-user.handler
     events:
       - http:
-          path: collections/{id}/users/
+          path: collections/{collectionId}/users/
           method: delete
           cors: true
