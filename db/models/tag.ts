@@ -15,7 +15,7 @@ const TagSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    userEmail: {
+    collectionId: {
       type: String,
       required: true,
     },

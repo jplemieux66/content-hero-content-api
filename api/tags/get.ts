@@ -6,9 +6,10 @@ import httpErrorHandler from '@middy/http-error-handler';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
+import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { Tag } from '../../db/models/tag';
+import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 
@@ -16,16 +17,19 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
   try {
+    const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
+    await verifyCollection(collectionId, userEmail);
+
     const tag = await Tag.findOne({
       _id: event.pathParameters.id,
-      userEmail,
+      collectionId,
     });
     if (!tag) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'text/plain' },
-        body: "Couldn't find the item to delete",
+        body: "Couldn't find the item",
       };
     }
     return {

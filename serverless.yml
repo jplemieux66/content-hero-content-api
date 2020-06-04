@@ -79,7 +79,7 @@ functions:
     handler: api/tags/create.handler
     events:
       - http:
-          path: tags
+          path: /collections/{collectionId}/tags
           method: post
           cors: true
 
@@ -87,7 +87,7 @@ functions:
     handler: api/tags/list.handler
     events:
       - http:
-          path: tags
+          path: /collections/{collectionId}/tags
           method: get
           cors: true
 
@@ -95,7 +95,7 @@ functions:
     handler: api/tags/get.handler
     events:
       - http:
-          path: tags/{id}
+          path: /collections/{collectionId}/tags/{id}
           method: get
           cors: true
 
@@ -103,7 +103,7 @@ functions:
     handler: api/tags/update.handler
     events:
       - http:
-          path: tags/{id}
+          path: /collections/{collectionId}/tags/{id}
           method: patch
           cors: true
 
@@ -111,7 +111,7 @@ functions:
     handler: api/tags/delete.handler
     events:
       - http:
-          path: tags/{id}
+          path: /collections/{collectionId}/tags/{id}
           method: delete
           cors: true
 

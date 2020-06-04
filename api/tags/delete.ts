@@ -5,25 +5,27 @@ import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import * as AWS from 'aws-sdk';
 
 import { initDatabase } from '../../db/db';
+import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { Tag } from '../../db/models/tag';
+import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
-const s3 = new AWS.S3();
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
   try {
+    const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
+    await verifyCollection(collectionId, userEmail);
+
     const item = await Tag.findOneAndDelete(
       {
         _id: event.pathParameters.id,
-        userEmail,
+        collectionId,
       },
       event.body as any,
     );
