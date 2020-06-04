@@ -23,7 +23,7 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const content = await Content.findOne({
       _id: event.pathParameters.id,
-      userEmail,
+      collectionId,
     });
     if (!content) {
       return {
