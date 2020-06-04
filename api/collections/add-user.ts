@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
+import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
@@ -26,7 +27,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const existingCollectionUser = CollectionUser.findOne({
       collectionId,
-      userEmail: userEmail,
+      userEmail,
     });
 
     if (existingCollectionUser) {
@@ -45,9 +46,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        collectionUser,
-      }),
+      body: JSON.stringify({}),
     };
   } catch (e) {
     console.error(e);
@@ -60,6 +59,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 };
 
 export const handler = middy(addUserHandler)
+  .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
   .use(cors());
