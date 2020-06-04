@@ -114,3 +114,60 @@ functions:
           path: tags/{id}
           method: delete
           cors: true
+
+  # Collections API
+  collections-create:
+    handler: api/collections/create.handler
+    events:
+      - http:
+          path: collections
+          method: post
+          cors: true
+
+  collections-list:
+    handler: api/collections/list.handler
+    events:
+      - http:
+          path: collections
+          method: get
+          cors: true
+
+  collections-get:
+    handler: api/collections/get.handler
+    events:
+      - http:
+          path: collections/{id}
+          method: get
+          cors: true
+
+  collections-update:
+    handler: api/collections/update.handler
+    events:
+      - http:
+          path: collections/{id}
+          method: patch
+          cors: true
+
+  collections-delete:
+    handler: api/collections/delete.handler
+    events:
+      - http:
+          path: collections/{id}
+          method: delete
+          cors: true
+
+  collections-add-user:
+    handler: api/collections/add-user.handler
+    events:
+      - http:
+          path: collections/{id}/users/
+          method: post
+          cors: true
+
+  collections-remove-user:
+    handler: api/collections/remove-user.handler
+    events:
+      - http:
+          path: collections/{id}/users/
+          method: delete
+          cors: true
