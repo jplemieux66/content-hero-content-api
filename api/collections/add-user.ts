@@ -25,7 +25,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const { userEmail } = event.body as any;
 
-    const existingCollectionUser = CollectionUser.findOne({
+    const existingCollectionUser = await CollectionUser.findOne({
       collectionId,
       userEmail,
     });
