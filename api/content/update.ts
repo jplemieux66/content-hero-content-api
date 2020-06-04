@@ -7,9 +7,10 @@ import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
+import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { Content } from '../../db/models/content';
+import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 
@@ -18,12 +19,14 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const body = event.body as any;
+    const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
+    await verifyCollection(collectionId, userEmail);
 
     let item = await Content.findOneAndUpdate(
       {
         _id: event.pathParameters.id,
-        userEmail,
+        collectionId,
       },
       body,
     );

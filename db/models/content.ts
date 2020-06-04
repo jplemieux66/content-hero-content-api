@@ -39,7 +39,7 @@ export interface Content extends mongoose.Document {
   duration: string;
   thumbnails: ContentThumbnail[];
   tags: string[];
-  userEmail: string;
+  collectionId: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -92,7 +92,7 @@ const ContentSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
-    userEmail: {
+    collectionId: {
       type: String,
       required: true,
     },

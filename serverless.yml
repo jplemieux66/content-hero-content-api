@@ -38,7 +38,7 @@ functions:
     handler: api/content/create.handler
     events:
       - http:
-          path: content
+          path: /collections/${collectionId}/content
           method: post
           cors: true
 
@@ -46,7 +46,7 @@ functions:
     handler: api/content/list.handler
     events:
       - http:
-          path: content
+          path: /collections/${collectionId}/content
           method: get
           cors: true
 
@@ -54,7 +54,7 @@ functions:
     handler: api/content/get.handler
     events:
       - http:
-          path: content/{id}
+          path: /collections/${collectionId}/content/{id}
           method: get
           cors: true
 
@@ -62,7 +62,7 @@ functions:
     handler: api/content/update.handler
     events:
       - http:
-          path: content/{id}
+          path: /collections/${collectionId}/content/{id}
           method: patch
           cors: true
 
@@ -70,7 +70,7 @@ functions:
     handler: api/content/delete.handler
     events:
       - http:
-          path: content/{id}
+          path: /collections/${collectionId}/content/{id}
           method: delete
           cors: true
 

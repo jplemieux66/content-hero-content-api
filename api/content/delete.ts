@@ -8,9 +8,10 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 
 import { initDatabase } from '../../db/db';
+import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { Content } from '../../db/models/content';
+import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 const s3 = new AWS.S3();
@@ -19,11 +20,14 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
   try {
+    const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
+    await verifyCollection(collectionId, userEmail);
+
     const item = await Content.findOneAndDelete(
       {
         _id: event.pathParameters.id,
-        userEmail,
+        collectionId,
       },
       event.body as any,
     );

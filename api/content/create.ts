@@ -10,19 +10,22 @@ import { initDatabase } from '../../db/db';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { Content } from '../../db/models/content';
+import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 
 const create: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
-  const body = event.body as any;
-  const userEmail = getUserEmail(event);
-
   try {
+    const body = event.body as any;
+    const collectionId = event.pathParameters.collectionId;
+    const userEmail = getUserEmail(event);
+    await verifyCollection(collectionId, userEmail);
+
     const item = await new Content({
       ...body,
-      userEmail,
+      collectionId,
     });
     await item.save();
     return {
