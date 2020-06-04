@@ -10,7 +10,7 @@
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
     "deploy:test": "serverless deploy --stage test",
-    "offline": "serverless offline --printOutput --stage dev --httpPort 3000 --lambdaPort 3002"
+    "offline": "IS_OFFLINE=true serverless offline --printOutput --stage dev --httpPort 3000 --lambdaPort 3002"
   },
   "jest": {
     "testEnvironment": "node",
@@ -26,8 +26,10 @@
     "@middy/http-json-body-parser": "^1.0.0",
     "aws-sdk": "^2.673.0",
     "debug": "^4.1.1",
+    "googleapis": "^51.0.0",
     "http-errors": "^1.7.3",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.26.0",
     "mongoose": "^5.9.15",
     "serverless-dotenv-plugin": "^2.4.2",
     "source-map-support": "^0.5.10",

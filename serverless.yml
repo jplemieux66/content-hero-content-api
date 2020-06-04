@@ -114,3 +114,28 @@ functions:
           path: tags/{id}
           method: delete
           cors: true
+
+  # Google Drive
+  google-get-login-url:
+    handler: api/google-drive/get-login-url.handler
+    events:
+      - http:
+          path: google-drive/get-login-url
+          method: post
+          cors: true
+
+  google-auth:
+    handler: api/google-drive/auth.handler
+    events:
+      - http:
+          path: google-drive/auth
+          method: post
+          cors: true
+
+  google-list-files:
+    handler: api/google-drive/list-files.handler
+    events:
+      - http:
+          path: google-drive/list
+          method: get
+          cors: true
