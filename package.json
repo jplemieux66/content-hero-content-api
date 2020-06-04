@@ -10,7 +10,7 @@
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
     "deploy:test": "serverless deploy --stage test",
-    "offline": "serverless offline --printOutput --stage dev --httpPort 3000 --lambdaPort 3002"
+    "offline": "IS_OFFLINE=true serverless offline --printOutput --stage dev --httpPort 3000 --lambdaPort 3002"
   },
   "jest": {
     "testEnvironment": "node",
