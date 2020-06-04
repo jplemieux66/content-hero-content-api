@@ -10,7 +10,6 @@ export const verifyCollection = async (collectionId, userEmail) => {
     }),
     Collection.findOne({
       _id: collectionId,
-      userEmail,
     }),
   ]);
 
