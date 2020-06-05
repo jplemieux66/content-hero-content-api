@@ -8,6 +8,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
 import { Collection } from '../../db/models/collection';
+import { CollectionUser } from '../../db/models/collection-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { verifyCollection } from '../../utils/verify-collection';
@@ -32,10 +33,16 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
     );
 
     const newCollection = await Collection.findById(collectionId);
+    const collectionUsers = await CollectionUser.find({
+      collectionId: collectionId,
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify(newCollection),
+      body: JSON.stringify({
+        ...newCollection,
+        userEmails: collectionUsers.map((u) => u.userEmail),
+      }),
     };
   } catch (e) {
     console.error(e);

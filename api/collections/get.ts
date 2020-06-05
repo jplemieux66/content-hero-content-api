@@ -10,6 +10,7 @@ import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { verifyCollection } from '../../utils/verify-collection';
 import { Collection } from '../../db/models/collection';
+import { CollectionUser } from '../../db/models/collection-user';
 
 initDatabase();
 
@@ -23,10 +24,16 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
     await verifyCollection(collectionId, userEmail);
 
     const collection = await Collection.findById(collectionId);
+    const collectionUsers = await CollectionUser.find({
+      collectionId: collectionId,
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify(collection),
+      body: JSON.stringify({
+        ...collection,
+        userEmails: collectionUsers.map((u) => u.userEmail),
+      }),
     };
   } catch (e) {
     console.error(e);

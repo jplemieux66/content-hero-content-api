@@ -34,7 +34,10 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify(collection),
+      body: JSON.stringify({
+        ...collection,
+        userEmails: [collectionUser.userEmail],
+      }),
     };
   } catch (e) {
     console.error(e.message || e);

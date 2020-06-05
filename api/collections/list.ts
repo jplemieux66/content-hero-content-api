@@ -18,17 +18,32 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const userEmail = getUserEmail(event);
-    const collectionUsers = await CollectionUser.find({ userEmail });
-    const collectionsId = collectionUsers.map((cu) => cu.collectionId);
-    const collections = await Collection.find({
-      _id: {
-        $in: collectionsId,
-      },
+    const myCollectionUsers = await CollectionUser.find({ userEmail });
+    const collectionsId = myCollectionUsers.map((cu) => cu.collectionId);
+
+    const [myCollections, allCollectionUsers] = await Promise.all([
+      await Collection.find({
+        _id: {
+          $in: collectionsId,
+        },
+      }),
+      await CollectionUser.find({
+        collectionId: {
+          $in: collectionsId,
+        },
+      }),
+    ]);
+
+    myCollections.map((c) => {
+      const userEmails = allCollectionUsers
+        .filter((u) => u.collectionId === c._id)
+        .map((u) => u.userEmail);
+      c.userEmails = userEmails;
     });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ collections }),
+      body: JSON.stringify(myCollections),
     };
   } catch (e) {
     console.error(e);

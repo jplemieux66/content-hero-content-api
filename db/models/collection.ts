@@ -5,6 +5,7 @@ export interface Collection extends mongoose.Document {
   description: string;
   createdAt: number;
   updatedAt: number;
+  userEmails?: string[];
 }
 
 const CollectionSchema = new mongoose.Schema(
