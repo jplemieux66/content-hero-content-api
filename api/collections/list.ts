@@ -21,18 +21,16 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
     const myCollectionUsers = await CollectionUser.find({ userEmail });
     const collectionsId = myCollectionUsers.map((cu) => cu.collectionId);
 
-    const [myCollections, allCollectionUsers] = await Promise.all([
-      await Collection.find({
-        _id: {
-          $in: collectionsId,
-        },
-      }),
-      await CollectionUser.find({
-        collectionId: {
-          $in: collectionsId,
-        },
-      }),
-    ]);
+    const myCollections = await Collection.find({
+      _id: {
+        $in: collectionsId,
+      },
+    });
+    const allCollectionUsers = await CollectionUser.find({
+      collectionId: {
+        $in: collectionsId,
+      },
+    });
 
     myCollections.map((c) => {
       const userEmails = allCollectionUsers
