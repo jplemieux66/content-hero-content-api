@@ -48,6 +48,7 @@ describe('POST /collection', () => {
     // Assert
     await expect(res.status).toBe(200);
     await expect(res.data.name).toEqual(data.name);
+    await expect(res.data.userEmails).toContain(process.env.AUTH0_USER_1_EMAIL);
     const collectionId = res.data._id;
     const userEmail = process.env.AUTH0_USER_1_EMAIL;
     const dbCollectionUser = CollectionUser.findOne({
@@ -103,6 +104,7 @@ describe('UPDATE /collections/:id', () => {
     await expect(res.status).toBe(200);
     await expect(res.data._id).toEqual(initialCollection._id.toString());
     await expect(res.data.name).toEqual(newName);
+    await expect(res.data.userEmails).toContain(process.env.AUTH0_USER_1_EMAIL);
   });
 
   test('Should fail if there is no token', async () => {
@@ -328,6 +330,9 @@ describe('GET /collections', () => {
     // Assert
     await expect(res.status).toBe(200);
     await expect(res.data.collections.length).toEqual(dataLength);
+    await expect(res.data.collections[0].userEmails).toContain(
+      process.env.AUTH0_USER_1_EMAIL,
+    );
   });
 
   test('Should fail if there is no token', async () => {

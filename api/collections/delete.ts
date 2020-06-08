@@ -12,6 +12,8 @@ import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { CollectionUser } from '../../db/models/collection-user';
 import { verifyCollection } from '../../utils/verify-collection';
+import { Content } from '../../db/models/content';
+import { Tag } from '../../db/models/tag';
 
 initDatabase();
 
@@ -29,6 +31,12 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
         _id: collectionId,
       }),
       CollectionUser.deleteMany({
+        collectionId,
+      }),
+      Content.deleteMany({
+        collectionId,
+      }),
+      Tag.deleteMany({
         collectionId,
       }),
     ]);
