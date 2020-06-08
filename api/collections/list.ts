@@ -34,7 +34,7 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
 
     myCollections.map((c) => {
       const userEmails = allCollectionUsers
-        .filter((u) => u.collectionId === c._id)
+        .filter((u) => u.collectionId === c._id.toString())
         .map((u) => u.userEmail);
       c.userEmails = userEmails;
     });

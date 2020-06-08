@@ -21,23 +21,22 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
   const userEmail = getUserEmail(event);
 
   try {
-    const collection = await new Collection({
+    const collection = new Collection({
       ...body,
     });
     await collection.save();
 
-    const collectionUser = await new CollectionUser({
+    const collectionUser = new CollectionUser({
       collectionId: collection._id,
       userEmail,
     });
     collectionUser.save();
 
+    collection.userEmails = [collectionUser.userEmail];
+
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        ...collection,
-        userEmails: [collectionUser.userEmail],
-      }),
+      body: JSON.stringify(collection),
     };
   } catch (e) {
     console.error(e.message || e);

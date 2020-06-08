@@ -36,13 +36,11 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
     const collectionUsers = await CollectionUser.find({
       collectionId: collectionId,
     });
+    newCollection.userEmails = collectionUsers.map((u) => u.userEmail);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        ...newCollection,
-        userEmails: collectionUsers.map((u) => u.userEmail),
-      }),
+      body: JSON.stringify(newCollection),
     };
   } catch (e) {
     console.error(e);

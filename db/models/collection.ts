@@ -17,6 +17,9 @@ const CollectionSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    userEmails: {
+      type: [String],
+    },
   },
   { timestamps: true },
 );
