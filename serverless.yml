@@ -171,3 +171,11 @@ functions:
           path: collections/{collectionId}/users/
           method: delete
           cors: true
+
+  collections-update-user:
+    handler: api/collections/update-user.handler
+    events:
+      - http:
+          path: collections/{collectionId}/users/
+          method: patch
+          cors: true

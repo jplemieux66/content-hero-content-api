@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import { disconnectDatabase, initDatabase } from '../../db/db';
 import { Collection } from '../../db/models/collection';
 import { CollectionUser } from '../../db/models/collection-user';
+import { Tag } from '../../db/models/tag';
 import { getToken } from '../_auth/auth';
 
 dotenv.config({ path: 'config/.env.test' });
@@ -85,13 +86,14 @@ describe('UPDATE /collections/:id', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
     const newName = 'UPDATED';
 
     // Act
     const res = await axios.patch(
-      process.env.API_URL + '/collections/' + initialCollection._id.toString(),
+      process.env.API_URL + '/collections/' + initialCollection._id,
       { name: newName },
       {
         headers: {
@@ -195,11 +197,13 @@ describe('DELETE /collections/:id', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
     const collectionUser2 = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await collectionUser2.save();
 
@@ -306,6 +310,7 @@ describe('GET /collections', () => {
       const collectionUser = new CollectionUser({
         collectionId: collection._id,
         userEmail: process.env.AUTH0_USER_1_EMAIL,
+        tags: [],
       });
       await collectionUser.save();
     }
@@ -317,6 +322,7 @@ describe('GET /collections', () => {
     const unauthorizedCollectionUser = new CollectionUser({
       collectionId: unauthorizedCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await unauthorizedCollectionUser.save();
 
@@ -329,8 +335,8 @@ describe('GET /collections', () => {
 
     // Assert
     await expect(res.status).toBe(200);
-    await expect(res.data.collections.length).toEqual(dataLength);
-    await expect(res.data.collections[0].userEmails).toContain(
+    await expect(res.data.length).toEqual(dataLength);
+    await expect(res.data[0].userEmails).toContain(
       process.env.AUTH0_USER_1_EMAIL,
     );
   });
@@ -345,6 +351,7 @@ describe('GET /collections', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
 
@@ -371,12 +378,13 @@ describe('GET /collections/:id', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
 
     // Act
     const res = await axios.get(
-      process.env.API_URL + '/collections/' + initialCollection._id,
+      process.env.API_URL + '/collections/' + initialCollection._id.toString(),
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -399,6 +407,7 @@ describe('GET /collections/:id', () => {
     const collectionUser = new CollectionUser({
       collectionId: unauthorizedCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
 
@@ -427,6 +436,7 @@ describe('GET /collections/:id', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
 
@@ -455,6 +465,7 @@ describe('POST /collections/:id/users', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
     const newUserEmail = process.env.AUTH0_USER_2_EMAIL;
@@ -492,6 +503,7 @@ describe('POST /collections/:id/users', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
     const newUserEmail = process.env.AUTH0_USER_1_EMAIL;
@@ -531,6 +543,7 @@ describe('POST /collections/:id/users', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
     const newUserEmail = process.env.AUTH0_USER_2_EMAIL;
@@ -569,12 +582,14 @@ describe('DELETE /collections/:id/users?userEmail=x', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
 
     const collectionUser2 = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await collectionUser2.save();
 
@@ -613,6 +628,7 @@ describe('DELETE /collections/:id/users?userEmail=x', () => {
     const collectionUser2 = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await collectionUser2.save();
 
@@ -651,12 +667,14 @@ describe('DELETE /collections/:id/users?userEmail=x', () => {
     const collectionUser = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
     });
     await collectionUser.save();
 
     const collectionUser2 = new CollectionUser({
       collectionId: initialCollection._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
     });
     await collectionUser2.save();
 
@@ -668,6 +686,151 @@ describe('DELETE /collections/:id/users?userEmail=x', () => {
           initialCollection._id +
           '/users?userEmail=' +
           process.env.AUTH0_USER_2_EMAIL,
+      );
+    } catch (e) {
+      // Assert
+      await expect(e.response.status).not.toBe(200);
+      return;
+    }
+
+    throw new Error('Should have thrown error');
+  });
+});
+
+describe('PATCH /collections/:id/users', () => {
+  test('Should update user', async () => {
+    // Arrange
+    const data = getTestCollection();
+    const initialCollection = new Collection({
+      ...data,
+    });
+
+    await initialCollection.save();
+
+    const collectionUser = new CollectionUser({
+      collectionId: initialCollection._id,
+      userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
+    });
+    await collectionUser.save();
+
+    const collectionUser2 = new CollectionUser({
+      collectionId: initialCollection._id,
+      userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
+    });
+    await collectionUser2.save();
+
+    const tag = new Tag({
+      name: 'Test',
+      collectionId: initialCollection._id,
+    });
+    await tag.save();
+
+    // Act
+    const res = await axios.patch(
+      process.env.API_URL +
+        '/collections/' +
+        initialCollection._id +
+        '/users?userEmail=' +
+        process.env.AUTH0_USER_2_EMAIL,
+      { tags: [tag._id] },
+      {
+        headers: {
+          Authorization: `Bearer ${user1Token}`,
+        },
+      },
+    );
+
+    // Assert
+    expect(res.status).toEqual(200);
+    expect(res.data.tags[0]).toEqual(tag._id.toString());
+  });
+
+  test('Should not update user in unauthorized collection', async () => {
+    // Arrange
+    const data = getTestCollection();
+    const initialCollection = new Collection({
+      ...data,
+    });
+
+    await initialCollection.save();
+
+    const collectionUser2 = new CollectionUser({
+      collectionId: initialCollection._id,
+      userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
+    });
+    await collectionUser2.save();
+
+    const tag = new Tag({
+      name: 'Test',
+      collectionId: initialCollection._id,
+    });
+    await tag.save();
+
+    // Act
+    try {
+      await axios.patch(
+        process.env.API_URL +
+          '/collections/' +
+          initialCollection._id +
+          '/users?userEmail=' +
+          process.env.AUTH0_USER_2_EMAIL,
+        { tags: [tag._id] },
+        {
+          headers: {
+            Authorization: `Bearer ${user1Token}`,
+          },
+        },
+      );
+    } catch (e) {
+      // Assert
+      await expect(e.response.status).not.toBe(200);
+      return;
+    }
+
+    throw new Error('Should have thrown error');
+  });
+
+  test('Should fail if there is no token', async () => {
+    // Arrange
+    const data = getTestCollection();
+    const initialCollection = new Collection({
+      ...data,
+    });
+
+    await initialCollection.save();
+
+    const collectionUser = new CollectionUser({
+      collectionId: initialCollection._id,
+      userEmail: process.env.AUTH0_USER_1_EMAIL,
+      tags: [],
+    });
+    await collectionUser.save();
+
+    const collectionUser2 = new CollectionUser({
+      collectionId: initialCollection._id,
+      userEmail: process.env.AUTH0_USER_2_EMAIL,
+      tags: [],
+    });
+    await collectionUser2.save();
+
+    const tag = new Tag({
+      name: 'Test',
+      collectionId: initialCollection._id,
+    });
+    await tag.save();
+
+    // Act
+    try {
+      await axios.patch(
+        process.env.API_URL +
+          '/collections/' +
+          initialCollection._id +
+          '/users?userEmail=' +
+          process.env.AUTH0_USER_2_EMAIL,
+        { tags: [tag._id] },
       );
     } catch (e) {
       // Assert

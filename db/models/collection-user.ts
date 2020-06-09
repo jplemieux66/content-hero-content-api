@@ -17,6 +17,10 @@ const CollectionUserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    tags: {
+      type: [String],
+      required: true,
+    },
   },
   { timestamps: true },
 );
