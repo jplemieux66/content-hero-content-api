@@ -26,18 +26,6 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
         $in: collectionsId,
       },
     });
-    const allCollectionUsers = await CollectionUser.find({
-      collectionId: {
-        $in: collectionsId,
-      },
-    });
-
-    myCollections.map((c) => {
-      const userEmails = allCollectionUsers
-        .filter((u) => u.collectionId === c._id.toString())
-        .map((u) => u.userEmail);
-      c.userEmails = userEmails;
-    });
 
     return {
       statusCode: 200,

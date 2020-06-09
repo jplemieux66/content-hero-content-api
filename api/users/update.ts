@@ -14,40 +14,37 @@ import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 
-const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
+const updateUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
   const collectionId = event.pathParameters.collectionId;
+  const id = event.pathParameters.id;
 
   try {
+    const body = event.body as any;
     const requestUserEmail = getUserEmail(event);
 
     await verifyCollection(collectionId, requestUserEmail);
 
-    const { userEmail, tags } = event.body as any;
+    await CollectionUser.updateOne(
+      {
+        _id: id,
+      },
+      body,
+    );
 
-    const existingCollectionUser = await CollectionUser.findOne({
-      collectionId,
-      userEmail,
-    });
+    const collectionUser = await CollectionUser.findById(id);
 
-    if (existingCollectionUser) {
+    if (!collectionUser) {
       return {
-        statusCode: 422,
+        statusCode: 404,
         headers: { 'Content-Type': 'text/plain' },
-        body: 'User already in collection',
+        body: 'User not found',
       };
     }
 
-    const collectionUser = new CollectionUser({
-      collectionId,
-      userEmail,
-      tags,
-    });
-    await collectionUser.save();
-
     return {
       statusCode: 200,
-      body: JSON.stringify({}),
+      body: JSON.stringify(collectionUser),
     };
   } catch (e) {
     console.error(e);
@@ -59,7 +56,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   }
 };
 
-export const handler = middy(addUserHandler)
+export const handler = middy(updateUserHandler)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
