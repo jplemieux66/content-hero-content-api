@@ -22,11 +22,11 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
     const requestUserEmail = getUserEmail(event);
     await verifyCollection(collectionId, requestUserEmail);
 
-    const { userEmail, tags } = event.body as any;
+    const body = event.body as any;
 
     const existingCollectionUser = await CollectionUser.findOne({
       collectionId,
-      userEmail,
+      userEmail: body.userEmail,
     });
 
     if (existingCollectionUser) {
@@ -39,8 +39,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const collectionUser = new CollectionUser({
       collectionId,
-      userEmail,
-      tags,
+      ...body,
     });
     await collectionUser.save();
 

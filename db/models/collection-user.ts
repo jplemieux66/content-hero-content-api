@@ -7,6 +7,25 @@ export interface CollectionUser extends mongoose.Document {
   updatedAt: number;
 }
 
+const TagPermissionSchema = new mongoose.Schema({
+  tagId: {
+    type: String,
+    required: true,
+  },
+  canDownload: {
+    type: Boolean,
+    required: true,
+  },
+  canEdit: {
+    type: Boolean,
+    required: true,
+  },
+  canDelete: {
+    type: Boolean,
+    required: true,
+  },
+});
+
 const CollectionUserSchema = new mongoose.Schema(
   {
     collectionId: {
@@ -17,9 +36,13 @@ const CollectionUserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    tags: {
-      type: [String],
+    role: {
+      type: String,
+      enum: ['Admin', 'Standard', 'SelectedTagsOnly'],
       required: true,
+    },
+    tagPermissions: {
+      type: [TagPermissionSchema],
     },
   },
   { timestamps: true },

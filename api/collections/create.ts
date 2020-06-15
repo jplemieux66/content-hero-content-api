@@ -8,7 +8,9 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
 import { Collection } from '../../db/models/collection';
+import { CollectionUser } from '../../db/models/collection-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { getUserEmail } from '../../utils/get-user-email';
 
 initDatabase();
 
@@ -16,12 +18,20 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
   const body = event.body as any;
+  const userEmail = getUserEmail(event);
 
   try {
     const collection = new Collection({
       ...body,
     });
     await collection.save();
+
+    const collectionUser = new CollectionUser({
+      collectionId: collection._id,
+      userEmail,
+      role: 'Admin',
+    });
+    collectionUser.save();
 
     return {
       statusCode: 200,
