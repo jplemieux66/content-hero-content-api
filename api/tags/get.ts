@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -9,7 +9,7 @@ import { initDatabase } from '../../db/db';
 import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import createHttpError from 'http-errors';
 
 initDatabase();
@@ -18,13 +18,13 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
   try {
-    const collectionId = event.pathParameters.collectionId;
+    const projectId = event.pathParameters.projectId;
     const userEmail = getUserEmail(event);
-    const collectionUser = await getCollectionUser(collectionId, userEmail);
+    const projectUser = await getProjectUser(projectId, userEmail);
 
-    if (collectionUser.role === 'SelectedTagsOnly') {
+    if (projectUser.role === 'SelectedTagsOnly') {
       const isAllowed =
-        collectionUser.tagPermissions.find(
+        projectUser.tagPermissions.find(
           (p) => p.tagId === event.pathParameters.id,
         ) !== undefined;
       if (!isAllowed) {
@@ -34,7 +34,7 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const tag = await Tag.findOne({
       _id: event.pathParameters.id,
-      collectionId,
+      projectId,
     });
     if (!tag) {
       return {

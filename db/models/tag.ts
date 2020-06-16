@@ -15,7 +15,7 @@ const TagSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    collectionId: {
+    projectId: {
       type: String,
       required: true,
     },

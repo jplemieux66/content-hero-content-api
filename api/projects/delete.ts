@@ -7,11 +7,11 @@ import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
-import { Collection } from '../../db/models/collection';
+import { Project } from '../../db/models/project';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { CollectionUser } from '../../db/models/collection-user';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { ProjectUser } from '../../db/models/project-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import { Content } from '../../db/models/content';
 import { Tag } from '../../db/models/tag';
 import createHttpError from 'http-errors';
@@ -20,28 +20,28 @@ initDatabase();
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.collectionId;
+  const projectId = event.pathParameters.projectId;
 
   try {
     const userEmail = getUserEmail(event);
-    const collectionUser = await getCollectionUser(collectionId, userEmail);
+    const projectUser = await getProjectUser(projectId, userEmail);
 
-    if (collectionUser.role !== 'Admin') {
-      throw createHttpError(401, `User Role doesn't allow Collection deletion`);
+    if (projectUser.role !== 'Admin') {
+      throw createHttpError(401, `User Role doesn't allow Project deletion`);
     }
 
     await Promise.all([
-      Collection.deleteOne({
-        _id: collectionId,
+      Project.deleteOne({
+        _id: projectId,
       }),
-      CollectionUser.deleteMany({
-        collectionId,
+      ProjectUser.deleteMany({
+        projectId,
       }),
       Content.deleteMany({
-        collectionId,
+        projectId,
       }),
       Tag.deleteMany({
-        collectionId,
+        projectId,
       }),
     ]);
   } catch (e) {

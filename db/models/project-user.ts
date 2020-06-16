@@ -7,8 +7,8 @@ export interface TagPermission {
   canDelete: boolean;
 }
 
-export interface CollectionUser extends mongoose.Document {
-  collectionId: string;
+export interface ProjectUser extends mongoose.Document {
+  projectId: string;
   userEmail: string;
   role: 'Admin' | 'Standard' | 'SelectedTagsOnly';
   tagPermissions?: TagPermission[];
@@ -35,9 +35,9 @@ const TagPermissionSchema = new mongoose.Schema({
   },
 });
 
-const CollectionUserSchema = new mongoose.Schema(
+const ProjectUserSchema = new mongoose.Schema(
   {
-    collectionId: {
+    projectId: {
       type: String,
       required: true,
     },
@@ -57,10 +57,10 @@ const CollectionUserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-(global as any).CollectionUser =
-  (global as any).CollectionUser ||
-  mongoose.model('CollectionUser', CollectionUserSchema);
+(global as any).ProjectUser =
+  (global as any).ProjectUser ||
+  mongoose.model('ProjectUser', ProjectUserSchema);
 
-export const CollectionUser = (global as any).CollectionUser as mongoose.Model<
-  CollectionUser
+export const ProjectUser = (global as any).ProjectUser as mongoose.Model<
+  ProjectUser
 >;

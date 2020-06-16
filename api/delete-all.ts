@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import './projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';

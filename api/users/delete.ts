@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -7,37 +7,34 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import createHttpError from 'http-errors';
 
 import { initDatabase } from '../../db/db';
-import { CollectionUser } from '../../db/models/collection-user';
+import { ProjectUser } from '../../db/models/project-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
 initDatabase();
 
 const removeUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.collectionId;
+  const projectId = event.pathParameters.projectId;
   const id = event.pathParameters.id;
 
   try {
     const requestUserEmail = getUserEmail(event);
 
-    const collectionUser = await getCollectionUser(
-      collectionId,
-      requestUserEmail,
-    );
+    const projectUser = await getProjectUser(projectId, requestUserEmail);
 
-    if (collectionUser.role !== 'Admin') {
+    if (projectUser.role !== 'Admin') {
       throw createHttpError(401, `User Role doesn't allow user deletion`);
     }
 
-    const item = await CollectionUser.findByIdAndDelete(id);
+    const item = await ProjectUser.findByIdAndDelete(id);
 
     if (!item) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'text/plain' },
-        body: "Couldn't find the user in this collection.",
+        body: "Couldn't find the user in this project.",
       };
     }
 

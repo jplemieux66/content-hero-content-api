@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -10,7 +10,7 @@ import { initDatabase } from '../../db/db';
 import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import createHttpError from 'http-errors';
 
 initDatabase();
@@ -20,13 +20,13 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const body = event.body as any;
-    const collectionId = event.pathParameters.collectionId;
+    const projectId = event.pathParameters.projectId;
     const userEmail = getUserEmail(event);
-    const collectionUser = await getCollectionUser(collectionId, userEmail);
+    const projectUser = await getProjectUser(projectId, userEmail);
 
     let item = await Content.findOne({
       _id: event.pathParameters.id,
-      collectionId,
+      projectId,
     });
 
     if (!item) {
@@ -37,8 +37,8 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
       };
     }
 
-    if (collectionUser.role === 'SelectedTagsOnly') {
-      const tagPermissions = collectionUser.tagPermissions.filter(
+    if (projectUser.role === 'SelectedTagsOnly') {
+      const tagPermissions = projectUser.tagPermissions.filter(
         (permission) =>
           item.tags.find((tagId) => tagId === permission.tagId) !== undefined,
       );
@@ -53,7 +53,7 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
     await Content.updateOne(
       {
         _id: event.pathParameters.id,
-        collectionId,
+        projectId,
       },
       body,
     );

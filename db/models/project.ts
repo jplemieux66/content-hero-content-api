@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export interface Collection extends mongoose.Document {
+export interface Project extends mongoose.Document {
   name: string;
   description: string;
   createdAt: number;
@@ -8,7 +8,7 @@ export interface Collection extends mongoose.Document {
   userEmails?: string[];
 }
 
-const CollectionSchema = new mongoose.Schema(
+const ProjectSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -24,9 +24,7 @@ const CollectionSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-(global as any).Collection =
-  (global as any).Collection || mongoose.model('Collection', CollectionSchema);
+(global as any).Project =
+  (global as any).Project || mongoose.model('Project', ProjectSchema);
 
-export const Collection = (global as any).Collection as mongoose.Model<
-  Collection
->;
+export const Project = (global as any).Project as mongoose.Model<Project>;

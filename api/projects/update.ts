@@ -8,38 +8,38 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import createHttpError from 'http-errors';
 
 import { initDatabase } from '../../db/db';
-import { Collection } from '../../db/models/collection';
+import { Project } from '../../db/models/project';
 import { AuthMiddleware } from '../../utils/auth-middleware';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
 initDatabase();
 
 const update: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.collectionId;
+  const projectId = event.pathParameters.projectId;
 
   try {
     const body = event.body as any;
     const userEmail = getUserEmail(event);
-    const collectionUser = await getCollectionUser(collectionId, userEmail);
+    const projectUser = await getProjectUser(projectId, userEmail);
 
-    if (collectionUser.role !== 'Admin') {
-      throw createHttpError(401, `User Role doesn't allow Collection updates`);
+    if (projectUser.role !== 'Admin') {
+      throw createHttpError(401, `User Role doesn't allow Project updates`);
     }
 
-    await Collection.updateOne(
+    await Project.updateOne(
       {
-        _id: collectionId,
+        _id: projectId,
       },
       body,
     );
 
-    const newCollection = await Collection.findById(collectionId);
+    const newProject = await Project.findById(projectId);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(newCollection),
+      body: JSON.stringify(newProject),
     };
   } catch (e) {
     console.error(e);

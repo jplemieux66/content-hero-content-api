@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -11,7 +11,7 @@ import createHttpError from 'http-errors';
 import { initDatabase } from '../../db/db';
 import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
 initDatabase();
@@ -21,13 +21,13 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
 
   try {
-    const collectionId = event.pathParameters.collectionId;
+    const projectId = event.pathParameters.projectId;
     const userEmail = getUserEmail(event);
-    const collectionUser = await getCollectionUser(collectionId, userEmail);
+    const projectUser = await getProjectUser(projectId, userEmail);
 
     const item = await Content.findOne({
       _id: event.pathParameters.id,
-      collectionId,
+      projectId,
     });
 
     if (!item) {
@@ -38,8 +38,8 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
       };
     }
 
-    if (collectionUser.role === 'SelectedTagsOnly') {
-      const tagPermissions = collectionUser.tagPermissions.filter(
+    if (projectUser.role === 'SelectedTagsOnly') {
+      const tagPermissions = projectUser.tagPermissions.filter(
         (permission) =>
           item.tags.find((tagId) => tagId === permission.tagId) !== undefined,
       );
@@ -53,7 +53,7 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     await Content.deleteOne({
       _id: event.pathParameters.id,
-      collectionId,
+      projectId,
     });
 
     try {

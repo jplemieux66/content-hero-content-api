@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -7,53 +7,59 @@ import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
-import { CollectionUser } from '../../db/models/collection-user';
+import { ProjectUser } from '../../db/models/project-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import createHttpError from 'http-errors';
+import { sendInvitationEmail } from '../../utils/send-invitation-email';
+import { Project } from '../../db/models/project';
 
 initDatabase();
 
 const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.collectionId;
+  const projectId = event.pathParameters.projectId;
 
   try {
     const requestUserEmail = getUserEmail(event);
-    const requestCollectionUser = await getCollectionUser(
-      collectionId,
+    const requestProjectUser = await getProjectUser(
+      projectId,
       requestUserEmail,
     );
 
-    if (requestCollectionUser.role !== 'Admin') {
+    if (requestProjectUser.role !== 'Admin') {
       throw createHttpError(401, `User Role doesn't allow user creation`);
     }
 
     const body = event.body as any;
 
-    const existingCollectionUser = await CollectionUser.findOne({
-      collectionId,
+    const existingProjectUser = await ProjectUser.findOne({
+      projectId,
       userEmail: body.userEmail,
     });
 
-    if (existingCollectionUser) {
+    if (existingProjectUser) {
       return {
         statusCode: 422,
         headers: { 'Content-Type': 'text/plain' },
-        body: 'User already in collection',
+        body: 'User already in project',
       };
     }
 
-    const collectionUser = new CollectionUser({
-      collectionId,
+    const projectUser = new ProjectUser({
+      projectId,
       ...body,
     });
-    await collectionUser.save();
+    await projectUser.save();
+
+    const project = await Project.findById(projectId);
+
+    await sendInvitationEmail(project.name, requestUserEmail);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(collectionUser),
+      body: JSON.stringify(projectUser),
     };
   } catch (e) {
     console.error(e);

@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -10,7 +10,7 @@ import createHttpError from 'http-errors';
 import { initDatabase } from '../../db/db';
 import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
 initDatabase();
@@ -20,18 +20,18 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const body = event.body as any;
-    const collectionId = event.pathParameters.collectionId;
+    const projectId = event.pathParameters.projectId;
     const userEmail = getUserEmail(event);
-    const collectionUser = await getCollectionUser(collectionId, userEmail);
+    const projectUser = await getProjectUser(projectId, userEmail);
 
-    if (collectionUser.role !== 'Admin' && collectionUser.role !== 'Standard') {
+    if (projectUser.role !== 'Admin' && projectUser.role !== 'Standard') {
       throw createHttpError(401, `User Role doesn't allow tag editing`);
     }
 
     let item = await Tag.findOneAndUpdate(
       {
         _id: event.pathParameters.id,
-        collectionId,
+        projectId,
       },
       body,
     );

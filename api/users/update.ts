@@ -1,4 +1,4 @@
-import 'source-map-support/register';
+import '../projects/node_modules/source-map-support/register';
 
 import middy from '@middy/core';
 import cors from '@middy/http-cors';
@@ -7,41 +7,41 @@ import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 
 import { initDatabase } from '../../db/db';
-import { CollectionUser } from '../../db/models/collection-user';
+import { ProjectUser } from '../../db/models/project-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { getCollectionUser } from '../../utils/get-collection-user';
+import { getProjectUser } from '../../utils/get-project-user';
 import createHttpError from 'http-errors';
 
 initDatabase();
 
 const updateUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  const collectionId = event.pathParameters.collectionId;
+  const projectId = event.pathParameters.projectId;
   const id = event.pathParameters.id;
 
   try {
     const body = event.body as any;
     const requestUserEmail = getUserEmail(event);
-    const requestCollectionUser = await getCollectionUser(
-      collectionId,
+    const requestProjectUser = await getProjectUser(
+      projectId,
       requestUserEmail,
     );
 
-    if (requestCollectionUser.role !== 'Admin') {
+    if (requestProjectUser.role !== 'Admin') {
       throw createHttpError(401, `User Role doesn't allow user deletion`);
     }
 
-    await CollectionUser.updateOne(
+    await ProjectUser.updateOne(
       {
         _id: id,
       },
       body,
     );
 
-    const collectionUser = await CollectionUser.findById(id);
+    const projectUser = await ProjectUser.findById(id);
 
-    if (!collectionUser) {
+    if (!projectUser) {
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'text/plain' },
@@ -51,7 +51,7 @@ const updateUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify(collectionUser),
+      body: JSON.stringify(projectUser),
     };
   } catch (e) {
     console.error(e);

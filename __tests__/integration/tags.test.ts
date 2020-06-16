@@ -7,8 +7,8 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 
 import { disconnectDatabase, initDatabase } from '../../db/db';
-import { Collection } from '../../db/models/collection';
-import { CollectionUser } from '../../db/models/collection-user';
+import { Project } from '../../db/models/project';
+import { ProjectUser } from '../../db/models/project-user';
 import { Tag } from '../../db/models/tag';
 import { getToken } from '../_auth/auth';
 
@@ -16,8 +16,8 @@ dotenv.config({ path: 'config/.env.test' });
 jest.setTimeout(30000);
 
 let user1Token: string;
-let collection1Id: string;
-let collection2Id: string;
+let project1Id: string;
+let project2Id: string;
 
 beforeAll(async () => {
   await initDatabase();
@@ -26,23 +26,23 @@ beforeAll(async () => {
     process.env.AUTH0_USER_1_PASSWORD,
   );
 
-  const collection = new Collection({
+  const project = new Project({
     name: 'Test',
   });
-  await collection.save();
-  collection1Id = collection._id.toString();
+  await project.save();
+  project1Id = project._id.toString();
 
-  const collection2 = new Collection({
+  const project2 = new Project({
     name: 'Test2',
   });
-  await collection2.save();
-  collection2Id = collection2._id.toString();
+  await project2.save();
+  project2Id = project2._id.toString();
 
-  const collectionUser = new CollectionUser({
-    collectionId: collection1Id,
+  const projectUser = new ProjectUser({
+    projectId: project1Id,
     userEmail: process.env.AUTH0_USER_1_EMAIL,
   });
-  await collectionUser.save();
+  await projectUser.save();
 });
 
 afterAll(async () => {
@@ -62,12 +62,12 @@ describe('POST /tags', () => {
     // Arrange
     const data = {
       ...getTestTag(),
-      collectionId: collection1Id,
+      projectId: project1Id,
     };
 
     // Act
     const res = await axios.post(
-      `${process.env.API_URL}/collections/${collection1Id}/tags`,
+      `${process.env.API_URL}/projects/${project1Id}/tags`,
       data,
       {
         headers: { Authorization: `Bearer ${user1Token}` },
@@ -78,7 +78,7 @@ describe('POST /tags', () => {
     // Assert
     await expect(res.status).toBe(200);
     await expect(item.name).toEqual(data.name);
-    await expect(item.collectionId).toEqual(collection1Id);
+    await expect(item.projectId).toEqual(project1Id);
   });
 
   test('Should fail if there is no token', async () => {
@@ -88,7 +88,7 @@ describe('POST /tags', () => {
     // Act
     try {
       await axios.post(
-        `${process.env.API_URL}/collections/${collection1Id}/tags`,
+        `${process.env.API_URL}/projects/${project1Id}/tags`,
         data,
       );
     } catch (e) {
@@ -106,7 +106,7 @@ describe('UPDATE /tags/:id', () => {
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
     const newName = 'UPDATED';
@@ -115,7 +115,7 @@ describe('UPDATE /tags/:id', () => {
     const res = await axios.patch(
       `${
         process.env.API_URL
-      }/collections/${collection1Id}/tags/${initialItem._id.toString()}`,
+      }/projects/${project1Id}/tags/${initialItem._id.toString()}`,
       { name: newName },
       {
         headers: {
@@ -131,12 +131,12 @@ describe('UPDATE /tags/:id', () => {
     await expect(item.name).toEqual(newName);
   });
 
-  test('Should return 404 if tag is associated with another collection', async () => {
+  test('Should return 404 if tag is associated with another project', async () => {
     // Arrange
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await initialItem.save();
     const newName = 'UPDATED';
@@ -146,7 +146,7 @@ describe('UPDATE /tags/:id', () => {
       await axios.patch(
         `${
           process.env.API_URL
-        }/collections/${collection1Id}/tags/${initialItem._id.toString()}`,
+        }/projects/${project1Id}/tags/${initialItem._id.toString()}`,
         {
           name: newName,
         },
@@ -169,7 +169,7 @@ describe('UPDATE /tags/:id', () => {
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
     const newName = 'UPDATED';
@@ -178,7 +178,7 @@ describe('UPDATE /tags/:id', () => {
       await axios.patch(
         `${
           process.env.API_URL
-        }/collections/${collection1Id}/tags/${initialItem._id.toString()}`,
+        }/projects/${project1Id}/tags/${initialItem._id.toString()}`,
         {
           name: newName,
         },
@@ -198,7 +198,7 @@ describe('DELETE /tags/:id', () => {
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
@@ -206,7 +206,7 @@ describe('DELETE /tags/:id', () => {
     const res = await axios.delete(
       `${
         process.env.API_URL
-      }/collections/${collection1Id}/tags/${initialItem._id.toString()}`,
+      }/projects/${project1Id}/tags/${initialItem._id.toString()}`,
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -221,12 +221,12 @@ describe('DELETE /tags/:id', () => {
     await expect(nullItem).toBeNull();
   });
 
-  test('Should return 404 if tag is associated with another collection', async () => {
+  test('Should return 404 if tag is associated with another project', async () => {
     // Arrange
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await initialItem.save();
 
@@ -235,7 +235,7 @@ describe('DELETE /tags/:id', () => {
       await axios.delete(
         `${
           process.env.API_URL
-        }/collections/${collection2Id}/tags/${initialItem._id.toString()}`,
+        }/projects/${project2Id}/tags/${initialItem._id.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${user1Token}`,
@@ -255,7 +255,7 @@ describe('DELETE /tags/:id', () => {
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
@@ -264,7 +264,7 @@ describe('DELETE /tags/:id', () => {
       await axios.delete(
         `${
           process.env.API_URL
-        }/collections/${collection2Id}/tags/${initialItem._id.toString()}`,
+        }/projects/${project2Id}/tags/${initialItem._id.toString()}`,
       );
     } catch (e) {
       await expect(e.response.status).not.toBe(200);
@@ -283,19 +283,19 @@ describe('GET /tags', () => {
     for (let i = 0; i < dataLength; i++) {
       const item = new Tag({
         ...data,
-        collectionId: collection1Id,
+        projectId: project1Id,
       });
       await item.save();
     }
     const unauthorizedItem = new Tag({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await unauthorizedItem.save();
 
     // Act
     const res = await axios.get(
-      `${process.env.API_URL}/collections/${collection1Id}/tags/`,
+      `${process.env.API_URL}/projects/${project1Id}/tags/`,
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -313,15 +313,13 @@ describe('GET /tags', () => {
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
     // Act
     try {
-      await axios.get(
-        `${process.env.API_URL}/collections/${collection1Id}/tags/`,
-      );
+      await axios.get(`${process.env.API_URL}/projects/${project1Id}/tags/`);
     } catch (e) {
       await expect(e.response.status).not.toBe(200);
       return;
@@ -337,13 +335,13 @@ describe('GET /tags/:id', () => {
     const data = getTestTag();
     const item = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await item.save();
 
     // Act
     const res = await axios.get(
-      `${process.env.API_URL}/collections/${collection1Id}/tags/${item._id}`,
+      `${process.env.API_URL}/projects/${project1Id}/tags/${item._id}`,
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -356,19 +354,19 @@ describe('GET /tags/:id', () => {
     await expect(res.data._id).toEqual(item._id.toString());
   });
 
-  test('Should not get tag from other collection', async () => {
+  test('Should not get tag from other project', async () => {
     // Arrange
     const data = getTestTag();
     const item = new Tag({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await item.save();
 
     // Act
     try {
       await axios.get(
-        `${process.env.API_URL}/collections/${collection2Id}/tags/${item._id}`,
+        `${process.env.API_URL}/projects/${project2Id}/tags/${item._id}`,
         {
           headers: {
             Authorization: `Bearer ${user1Token}`,
@@ -385,14 +383,14 @@ describe('GET /tags/:id', () => {
     const data = getTestTag();
     const initialItem = new Tag({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
     // Act
     try {
       await axios.get(
-        `${process.env.API_URL}/collections/${collection1Id}/tags/${initialItem._id}`,
+        `${process.env.API_URL}/projects/${project1Id}/tags/${initialItem._id}`,
       );
     } catch (e) {
       // Assert

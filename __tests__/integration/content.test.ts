@@ -7,8 +7,8 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 
 import { disconnectDatabase, initDatabase } from '../../db/db';
-import { Collection } from '../../db/models/collection';
-import { CollectionUser } from '../../db/models/collection-user';
+import { Project } from '../../db/models/project';
+import { ProjectUser } from '../../db/models/project-user';
 import { Content } from '../../db/models/content';
 import { getToken } from '../_auth/auth';
 
@@ -16,8 +16,8 @@ dotenv.config({ path: 'config/.env.test' });
 jest.setTimeout(30000);
 
 let user1Token: string;
-let collection1Id: string;
-let collection2Id: string;
+let project1Id: string;
+let project2Id: string;
 
 beforeAll(async () => {
   await initDatabase();
@@ -26,28 +26,28 @@ beforeAll(async () => {
     process.env.AUTH0_USER_1_PASSWORD,
   );
 
-  const collection = new Collection({
+  const project = new Project({
     name: 'Test',
   });
-  await collection.save();
-  collection1Id = collection._id.toString();
+  await project.save();
+  project1Id = project._id.toString();
 
-  const collection2 = new Collection({
+  const project2 = new Project({
     name: 'Test2',
   });
-  await collection2.save();
-  collection2Id = collection2._id.toString();
+  await project2.save();
+  project2Id = project2._id.toString();
 
-  const collectionUser = new CollectionUser({
-    collectionId: collection1Id,
+  const projectUser = new ProjectUser({
+    projectId: project1Id,
     userEmail: process.env.AUTH0_USER_1_EMAIL,
   });
-  await collectionUser.save();
+  await projectUser.save();
 });
 
 afterAll(async () => {
-  await Collection.deleteMany({});
-  await CollectionUser.deleteMany({});
+  await Project.deleteMany({});
+  await ProjectUser.deleteMany({});
   disconnectDatabase();
 });
 
@@ -84,7 +84,7 @@ describe('POST /content', () => {
 
     // Act
     const res = await axios.post(
-      `${process.env.API_URL}/collections/${collection1Id}/content`,
+      `${process.env.API_URL}/projects/${project1Id}/content`,
       data,
       {
         headers: { Authorization: `Bearer ${user1Token}` },
@@ -95,7 +95,7 @@ describe('POST /content', () => {
     // Assert
     await expect(res.status).toBe(200);
     await expect(item.name).toEqual(data.name);
-    await expect(item.collectionId).toEqual(collection1Id);
+    await expect(item.projectId).toEqual(project1Id);
   });
 
   test('Should fail if there is no token', async () => {
@@ -105,7 +105,7 @@ describe('POST /content', () => {
     // Act
     try {
       const res = await axios.post(
-        `${process.env.API_URL}/collections/${collection1Id}/content`,
+        `${process.env.API_URL}/projects/${project1Id}/content`,
         data,
       );
 
@@ -126,7 +126,7 @@ describe('UPDATE /content/:id', () => {
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
     const newName = 'UPDATED';
@@ -134,8 +134,8 @@ describe('UPDATE /content/:id', () => {
     // Act
     const res = await axios.patch(
       process.env.API_URL +
-        '/collections/' +
-        collection1Id +
+        '/projects/' +
+        project1Id +
         '/content/' +
         initialItem._id.toString(),
       { name: newName },
@@ -153,12 +153,12 @@ describe('UPDATE /content/:id', () => {
     await expect(item.name).toEqual(newName);
   });
 
-  test('Should return 404 if content is associated with another collection', async () => {
+  test('Should return 404 if content is associated with another project', async () => {
     // Arrange
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await initialItem.save();
     const newName = 'UPDATED';
@@ -166,7 +166,7 @@ describe('UPDATE /content/:id', () => {
     // Act
     try {
       await axios.patch(
-        `${process.env.API_URL}/collections/${collection1Id}/content/${initialItem._id}`,
+        `${process.env.API_URL}/projects/${project1Id}/content/${initialItem._id}`,
         {
           name: newName,
         },
@@ -187,7 +187,7 @@ describe('UPDATE /content/:id', () => {
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
     const newName = 'UPDATED';
@@ -195,7 +195,7 @@ describe('UPDATE /content/:id', () => {
     // Act
     try {
       await axios.patch(
-        `${process.env.API_URL}/collections/${collection1Id}/content/${initialItem._id}`,
+        `${process.env.API_URL}/projects/${project1Id}/content/${initialItem._id}`,
         {
           name: newName,
         },
@@ -215,13 +215,13 @@ describe('DELETE /content/:id', () => {
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
     // Act
     const res = await axios.delete(
-      `${process.env.API_URL}/collections/${collection1Id}/content/${initialItem._id}`,
+      `${process.env.API_URL}/projects/${project1Id}/content/${initialItem._id}`,
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -236,19 +236,19 @@ describe('DELETE /content/:id', () => {
     await expect(nullItem).toBeNull();
   });
 
-  test('Should return 404 if content is associated with an unauthorized collection', async () => {
+  test('Should return 404 if content is associated with an unauthorized project', async () => {
     // Arrange
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await initialItem.save();
 
     // Act
     try {
       await axios.delete(
-        `${process.env.API_URL}/collections/${collection2Id}/content/${initialItem._id}`,
+        `${process.env.API_URL}/projects/${project2Id}/content/${initialItem._id}`,
         {
           headers: {
             Authorization: `Bearer ${user1Token}`,
@@ -268,14 +268,14 @@ describe('DELETE /content/:id', () => {
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
     // Act
     try {
       await axios.delete(
-        `${process.env.API_URL}/collections/${collection1Id}/content/${initialItem._id}`,
+        `${process.env.API_URL}/projects/${project1Id}/content/${initialItem._id}`,
       );
     } catch (e) {
       await expect(e.response.status).not.toBe(200);
@@ -287,26 +287,26 @@ describe('DELETE /content/:id', () => {
 });
 
 describe('GET /content', () => {
-  test('Should list content only for collection', async () => {
+  test('Should list content only for project', async () => {
     // Arrange
     const data = getTestContent();
     const dataLength = 3;
     for (let i = 0; i < dataLength; i++) {
       const item = new Content({
         ...data,
-        collectionId: collection1Id,
+        projectId: project1Id,
       });
       await item.save();
     }
     const unauthorizedItem = new Content({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await unauthorizedItem.save();
 
     // Act
     const res = await axios.get(
-      `${process.env.API_URL}/collections/${collection1Id}/content`,
+      `${process.env.API_URL}/projects/${project1Id}/content`,
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -324,15 +324,13 @@ describe('GET /content', () => {
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
 
     // Act
     try {
-      await axios.get(
-        `${process.env.API_URL}/collections/${collection1Id}/content`,
-      );
+      await axios.get(`${process.env.API_URL}/projects/${project1Id}/content`);
     } catch (e) {
       await expect(e.response.status).not.toBe(200);
       return;
@@ -348,13 +346,13 @@ describe('GET /content/:id', () => {
     const data = getTestContent();
     const item = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await item.save();
 
     // Act
     const res = await axios.get(
-      `${process.env.API_URL}/collections/${collection1Id}/content/${item._id}`,
+      `${process.env.API_URL}/projects/${project1Id}/content/${item._id}`,
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -367,19 +365,19 @@ describe('GET /content/:id', () => {
     await expect(res.data._id).toEqual(item._id.toString());
   });
 
-  test('Should not get content from unauthorized collection', async () => {
+  test('Should not get content from unauthorized project', async () => {
     // Arrange
     const data = getTestContent();
     const item = new Content({
       ...data,
-      collectionId: collection2Id,
+      projectId: project2Id,
     });
     await item.save();
 
     // Act
     try {
       await axios.get(
-        `${process.env.API_URL}/collections/${collection2Id}/content/${item._id}`,
+        `${process.env.API_URL}/projects/${project2Id}/content/${item._id}`,
         {
           headers: {
             Authorization: `Bearer ${user1Token}`,
@@ -396,13 +394,13 @@ describe('GET /content/:id', () => {
     const data = getTestContent();
     const initialItem = new Content({
       ...data,
-      collectionId: collection1Id,
+      projectId: project1Id,
     });
     await initialItem.save();
     // Act
     try {
       await axios.get(
-        `${process.env.API_URL}/collections/${collection1Id}/content/${initialItem._id}`,
+        `${process.env.API_URL}/projects/${project1Id}/content/${initialItem._id}`,
       );
     } catch (e) {
       // Assert

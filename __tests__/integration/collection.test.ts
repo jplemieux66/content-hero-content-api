@@ -1,5 +1,5 @@
 /**
- * Collection Integration Tests
+ * Project Integration Tests
  *
  * @group integration
  */
@@ -7,8 +7,8 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 
 import { disconnectDatabase, initDatabase } from '../../db/db';
-import { Collection } from '../../db/models/collection';
-import { CollectionUser } from '../../db/models/collection-user';
+import { Project } from '../../db/models/project';
+import { ProjectUser } from '../../db/models/project-user';
 import { getToken } from '../_auth/auth';
 
 dotenv.config({ path: 'config/.env.test' });
@@ -29,20 +29,20 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-  await Collection.deleteMany({});
-  await CollectionUser.deleteMany({});
+  await Project.deleteMany({});
+  await ProjectUser.deleteMany({});
 });
 
-const getTestCollection = () => ({
+const getTestProject = () => ({
   name: 'Test',
 });
 
-describe('POST /collection', () => {
-  test('Should create collection', async () => {
+describe('POST /project', () => {
+  test('Should create project', async () => {
     // Arrange
-    const data = getTestCollection();
+    const data = getTestProject();
     // Act
-    const res = await axios.post(process.env.API_URL + '/collections', data, {
+    const res = await axios.post(process.env.API_URL + '/projects', data, {
       headers: { Authorization: `Bearer ${user1Token}` },
     });
     // Assert
@@ -51,10 +51,10 @@ describe('POST /collection', () => {
   });
   test('Should fail if there is no token', async () => {
     // Arrange
-    const data = getTestCollection();
+    const data = getTestProject();
     // Act
     try {
-      const res = await axios.post(process.env.API_URL + '/collections', data);
+      const res = await axios.post(process.env.API_URL + '/projects', data);
       // Assert
       await expect(res.status).not.toBe(200);
     } catch (e) {
@@ -65,25 +65,25 @@ describe('POST /collection', () => {
   });
 });
 
-describe('UPDATE /collections/:id', () => {
-  test('Should update collection', async () => {
+describe('UPDATE /projects/:id', () => {
+  test('Should update project', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
-    const collectionUser = new CollectionUser({
-      collectionId: initialCollection._id,
+    await initialProject.save();
+    const projectUser = new ProjectUser({
+      projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
       tags: [],
     });
-    await collectionUser.save();
+    await projectUser.save();
     const newName = 'UPDATED';
 
     // Act
     const res = await axios.patch(
-      process.env.API_URL + '/collections/' + initialCollection._id,
+      process.env.API_URL + '/projects/' + initialProject._id,
       { name: newName },
       {
         headers: {
@@ -94,14 +94,14 @@ describe('UPDATE /collections/:id', () => {
 
     // Assert
     await expect(res.status).toBe(200);
-    await expect(res.data._id).toEqual(initialCollection._id.toString());
+    await expect(res.data._id).toEqual(initialProject._id.toString());
     await expect(res.data.name).toEqual(newName);
   });
 
   test('Should fail if there is no token', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialItem = new Collection({
+    const data = getTestProject();
+    const initialItem = new Project({
       ...data,
     });
     await initialItem.save();
@@ -119,10 +119,10 @@ describe('UPDATE /collections/:id', () => {
     throw new Error('Should have thrown error');
   });
 
-  test('Should return error if the collection does not exist', async () => {
+  test('Should return error if the project does not exist', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialItem = new Collection({
+    const data = getTestProject();
+    const initialItem = new Project({
       ...data,
     });
     await initialItem.save();
@@ -141,21 +141,19 @@ describe('UPDATE /collections/:id', () => {
     throw new Error('Should have thrown error');
   });
 
-  test('Should return error if the user is not in the collection', async () => {
+  test('Should return error if the user is not in the project', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
+    await initialProject.save();
     const newName = 'UPDATED';
 
     // Act
     try {
       await axios.patch(
-        process.env.API_URL +
-          '/collections/' +
-          initialCollection._id.toString(),
+        process.env.API_URL + '/projects/' + initialProject._id.toString(),
         {
           name: newName,
         },
@@ -175,30 +173,30 @@ describe('UPDATE /collections/:id', () => {
   });
 });
 
-describe('DELETE /collections/:id', () => {
-  test('Should delete collection', async () => {
+describe('DELETE /projects/:id', () => {
+  test('Should delete project', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
-    const collectionUser = new CollectionUser({
-      collectionId: initialCollection._id,
+    await initialProject.save();
+    const projectUser = new ProjectUser({
+      projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
       tags: [],
     });
-    await collectionUser.save();
-    const collectionUser2 = new CollectionUser({
-      collectionId: initialCollection._id,
+    await projectUser.save();
+    const projectUser2 = new ProjectUser({
+      projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
       tags: [],
     });
-    await collectionUser2.save();
+    await projectUser2.save();
 
     // Act
     const res = await axios.delete(
-      process.env.API_URL + '/collections/' + initialCollection._id.toString(),
+      process.env.API_URL + '/projects/' + initialProject._id.toString(),
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -209,19 +207,19 @@ describe('DELETE /collections/:id', () => {
     // Assert
     await expect(res.status).toBe(200);
 
-    const foundCollection = await Collection.findById(initialCollection._id);
-    await expect(foundCollection).toBeNull();
+    const foundProject = await Project.findById(initialProject._id);
+    await expect(foundProject).toBeNull();
 
-    const foundCollectionUsers = await CollectionUser.find({
-      collectionId: initialCollection._id,
+    const foundProjectUsers = await ProjectUser.find({
+      projectId: initialProject._id,
     });
-    await expect(foundCollectionUsers.length).toEqual(0);
+    await expect(foundProjectUsers.length).toEqual(0);
   });
 
   test('Should fail if there is no token', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialItem = new Collection({
+    const data = getTestProject();
+    const initialItem = new Project({
       ...data,
     });
     await initialItem.save();
@@ -237,10 +235,10 @@ describe('DELETE /collections/:id', () => {
     throw new Error('Should have thrown error');
   });
 
-  test('Should return error if the collection does not exist', async () => {
+  test('Should return error if the project does not exist', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialItem = new Collection({
+    const data = getTestProject();
+    const initialItem = new Project({
       ...data,
     });
     await initialItem.save();
@@ -256,20 +254,18 @@ describe('DELETE /collections/:id', () => {
     throw new Error('Should have thrown error');
   });
 
-  test('Should return error if the user is not in the collection', async () => {
+  test('Should return error if the user is not in the project', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
+    await initialProject.save();
 
     // Act
     try {
       await axios.delete(
-        process.env.API_URL +
-          '/collections/' +
-          initialCollection._id.toString(),
+        process.env.API_URL + '/projects/' + initialProject._id.toString(),
         {
           headers: {
             Authorization: `Bearer ${user1Token}`,
@@ -286,37 +282,37 @@ describe('DELETE /collections/:id', () => {
   });
 });
 
-describe('GET /collections', () => {
-  test('Should list collections only for user', async () => {
+describe('GET /projects', () => {
+  test('Should list projects only for user', async () => {
     // Arrange
-    const data = getTestCollection();
+    const data = getTestProject();
     const dataLength = 3;
     for (let i = 0; i < dataLength; i++) {
-      const collection = new Collection({
+      const project = new Project({
         ...data,
       });
-      await collection.save();
-      const collectionUser = new CollectionUser({
-        collectionId: collection._id,
+      await project.save();
+      const projectUser = new ProjectUser({
+        projectId: project._id,
         userEmail: process.env.AUTH0_USER_1_EMAIL,
         tags: [],
       });
-      await collectionUser.save();
+      await projectUser.save();
     }
 
-    const unauthorizedCollection = new Collection({
+    const unauthorizedProject = new Project({
       ...data,
     });
-    await unauthorizedCollection.save();
-    const unauthorizedCollectionUser = new CollectionUser({
-      collectionId: unauthorizedCollection._id,
+    await unauthorizedProject.save();
+    const unauthorizedProjectUser = new ProjectUser({
+      projectId: unauthorizedProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
       tags: [],
     });
-    await unauthorizedCollectionUser.save();
+    await unauthorizedProjectUser.save();
 
     // Act
-    const res = await axios.get(process.env.API_URL + '/collections', {
+    const res = await axios.get(process.env.API_URL + '/projects', {
       headers: {
         Authorization: `Bearer ${user1Token}`,
       },
@@ -329,21 +325,21 @@ describe('GET /collections', () => {
 
   test('Should fail if there is no token', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
-    const collectionUser = new CollectionUser({
-      collectionId: initialCollection._id,
+    await initialProject.save();
+    const projectUser = new ProjectUser({
+      projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
       tags: [],
     });
-    await collectionUser.save();
+    await projectUser.save();
 
     // Act
     try {
-      await axios.get(process.env.API_URL + '/collections');
+      await axios.get(process.env.API_URL + '/projects');
     } catch (e) {
       await expect(e.response.status).not.toBe(200);
       return;
@@ -353,24 +349,24 @@ describe('GET /collections', () => {
   });
 });
 
-describe('GET /collections/:id', () => {
-  test('Should get collection with id', async () => {
+describe('GET /projects/:id', () => {
+  test('Should get project with id', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
-    const collectionUser = new CollectionUser({
-      collectionId: initialCollection._id,
+    await initialProject.save();
+    const projectUser = new ProjectUser({
+      projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
       tags: [],
     });
-    await collectionUser.save();
+    await projectUser.save();
 
     // Act
     const res = await axios.get(
-      process.env.API_URL + '/collections/' + initialCollection._id.toString(),
+      process.env.API_URL + '/projects/' + initialProject._id.toString(),
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -380,27 +376,27 @@ describe('GET /collections/:id', () => {
 
     // Assert
     await expect(res.status).toBe(200);
-    await expect(res.data._id).toEqual(initialCollection._id.toString());
+    await expect(res.data._id).toEqual(initialProject._id.toString());
   });
 
-  test('Should not get unauthorized collection', async () => {
+  test('Should not get unauthorized project', async () => {
     // Arrange
-    const data = getTestCollection();
-    const unauthorizedCollection = new Collection({
+    const data = getTestProject();
+    const unauthorizedProject = new Project({
       ...data,
     });
-    await unauthorizedCollection.save();
-    const collectionUser = new CollectionUser({
-      collectionId: unauthorizedCollection._id,
+    await unauthorizedProject.save();
+    const projectUser = new ProjectUser({
+      projectId: unauthorizedProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
       tags: [],
     });
-    await collectionUser.save();
+    await projectUser.save();
 
     // Act
     try {
       await axios.get(
-        process.env.API_URL + '/content/' + unauthorizedCollection._id,
+        process.env.API_URL + '/content/' + unauthorizedProject._id,
         {
           headers: {
             Authorization: `Bearer ${user1Token}`,
@@ -414,23 +410,21 @@ describe('GET /collections/:id', () => {
 
   test('Should fail if there is no token', async () => {
     // Arrange
-    const data = getTestCollection();
-    const initialCollection = new Collection({
+    const data = getTestProject();
+    const initialProject = new Project({
       ...data,
     });
-    await initialCollection.save();
-    const collectionUser = new CollectionUser({
-      collectionId: initialCollection._id,
+    await initialProject.save();
+    const projectUser = new ProjectUser({
+      projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
       tags: [],
     });
-    await collectionUser.save();
+    await projectUser.save();
 
     // Act
     try {
-      await axios.get(
-        process.env.API_URL + '/collections/' + initialCollection._id,
-      );
+      await axios.get(process.env.API_URL + '/projects/' + initialProject._id);
     } catch (e) {
       await expect(e.response.status).not.toBe(200);
       return;
