@@ -76,7 +76,7 @@ describe('UPDATE /projects/:id', () => {
     const projectUser = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser.save();
     const newName = 'UPDATED';
@@ -184,13 +184,13 @@ describe('DELETE /projects/:id', () => {
     const projectUser = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser.save();
     const projectUser2 = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser2.save();
 
@@ -295,7 +295,7 @@ describe('GET /projects', () => {
       const projectUser = new ProjectUser({
         projectId: project._id,
         userEmail: process.env.AUTH0_USER_1_EMAIL,
-        tags: [],
+        role: 'Admin',
       });
       await projectUser.save();
     }
@@ -307,7 +307,7 @@ describe('GET /projects', () => {
     const unauthorizedProjectUser = new ProjectUser({
       projectId: unauthorizedProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await unauthorizedProjectUser.save();
 
@@ -333,7 +333,7 @@ describe('GET /projects', () => {
     const projectUser = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser.save();
 
@@ -360,7 +360,7 @@ describe('GET /projects/:id', () => {
     const projectUser = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser.save();
 
@@ -389,7 +389,7 @@ describe('GET /projects/:id', () => {
     const projectUser = new ProjectUser({
       projectId: unauthorizedProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser.save();
 
@@ -418,7 +418,7 @@ describe('GET /projects/:id', () => {
     const projectUser = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
-      tags: [],
+      role: 'Admin',
     });
     await projectUser.save();
 
