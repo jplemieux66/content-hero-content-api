@@ -2,12 +2,13 @@ import AWS from 'aws-sdk';
 
 export const sendInvitationEmail = (
   projectName: string,
+  newUserEmail: string,
   requestUserEmail: string,
 ): Promise<AWS.SES.SendEmailResponse> => {
   // Create sendEmail params
   const params = {
     Destination: {
-      ToAddresses: ['phillemieux66@hotmail.com'],
+      ToAddresses: [newUserEmail],
     },
     Message: {
       Body: {
@@ -24,7 +25,7 @@ export const sendInvitationEmail = (
         Data: `Content Star - You've been invited to join a project`,
       },
     },
-    Source: 'jeanphilippelemieux66+contenthero@gmail.com',
+    Source: '"Content Star" <jeanphilippelemieux66+contenthero@gmail.com>',
   };
 
   return new AWS.SES({

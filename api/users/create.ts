@@ -55,7 +55,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const project = await Project.findById(projectId);
 
-    await sendInvitationEmail(project.name, requestUserEmail);
+    await sendInvitationEmail(project.name, body.userEmail, requestUserEmail);
 
     return {
       statusCode: 200,
