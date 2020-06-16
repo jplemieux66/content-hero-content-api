@@ -386,7 +386,7 @@ describe('GET /content/:id', () => {
         },
       );
     } catch (e) {
-      await expect(e.response.status).toBe(404);
+      await expect([404, 403]).toContain(e.response.status);
     }
   });
 

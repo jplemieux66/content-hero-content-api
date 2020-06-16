@@ -41,6 +41,7 @@ beforeAll(async () => {
   const projectUser = new ProjectUser({
     projectId: project1Id,
     userEmail: process.env.AUTH0_USER_1_EMAIL,
+    role: 'Admin',
   });
   await projectUser.save();
 });
