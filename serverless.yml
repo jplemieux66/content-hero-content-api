@@ -23,6 +23,11 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     AUTH0_CLIENT_PUBLIC_KEY: ${file(${env:AUTH0_CLIENT_PUBLIC_KEY_PATH})}
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'ses:*'
+      Resource: '*'
 
 functions:
   delete-all:
