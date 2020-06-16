@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 
 import { disconnectDatabase, initDatabase } from '../../db/db';
 import { Project } from '../../db/models/project';
-import { ProjectUser } from '../../db/models/project-user';
+import { ProjectUser, TagPermission } from '../../db/models/project-user';
 import { Tag } from '../../db/models/tag';
 import { getToken } from '../_auth/auth';
 
@@ -129,36 +129,43 @@ describe('POST /projects/:id/users', () => {
       ...data,
     });
     await initialProject.save();
+
     const projectUser = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_1_EMAIL,
       role: 'Admin',
     });
     await projectUser.save();
+
     const newUserEmail = process.env.AUTH0_USER_2_EMAIL;
 
     // Act
-    const res = await axios.post(
-      process.env.API_URL + '/projects/' + initialProject._id + '/users',
-      {
-        userEmail: newUserEmail,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${user1Token}`,
+    try {
+      const res = await axios.post(
+        process.env.API_URL + '/projects/' + initialProject._id + '/users',
+        {
+          userEmail: newUserEmail,
+          role: 'Standard',
         },
-      },
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${user1Token}`,
+          },
+        },
+      );
 
-    // Assert
-    expect(res.status).toEqual(200);
-    expect(res.data.userEmail).toEqual(newUserEmail);
-    const dbProjectUser = await ProjectUser.findOne({
-      projectId: initialProject._id,
-      userEmail: newUserEmail,
-    });
-    expect(dbProjectUser).not.toBeNull();
-    expect(dbProjectUser).not.toBeUndefined();
+      // Assert
+      expect(res.status).toEqual(200);
+      expect(res.data.userEmail).toEqual(newUserEmail);
+      const dbProjectUser = await ProjectUser.findOne({
+        projectId: initialProject._id,
+        userEmail: newUserEmail,
+      });
+      expect(dbProjectUser).not.toBeNull();
+      expect(dbProjectUser).not.toBeUndefined();
+    } catch (e) {
+      throw e;
+    }
   });
 
   test('Should not add user to unauthorized project', async () => {
@@ -238,7 +245,6 @@ describe('DELETE /projects/:id/users?userEmail=x', () => {
     const initialProject = new Project({
       ...data,
     });
-
     await initialProject.save();
 
     const projectUser = new ProjectUser({
@@ -379,7 +385,8 @@ describe('PATCH /projects/:id/users', () => {
     const projectUser2 = new ProjectUser({
       projectId: initialProject._id,
       userEmail: process.env.AUTH0_USER_2_EMAIL,
-      role: 'Admin',
+      role: 'SelectedTagsOnly',
+      tags: [],
     });
     await projectUser2.save();
 
@@ -389,6 +396,13 @@ describe('PATCH /projects/:id/users', () => {
     });
     await tag.save();
 
+    const tagPermission: TagPermission = {
+      tagId: tag._id,
+      canDelete: true,
+      canDownload: true,
+      canEdit: true,
+    };
+
     // Act
     const res = await axios.patch(
       process.env.API_URL +
@@ -396,7 +410,7 @@ describe('PATCH /projects/:id/users', () => {
         initialProject._id +
         '/users/' +
         projectUser2._id,
-      { tags: [tag._id] },
+      { tagPermissions: [tagPermission] },
       {
         headers: {
           Authorization: `Bearer ${user1Token}`,
@@ -406,7 +420,7 @@ describe('PATCH /projects/:id/users', () => {
 
     // Assert
     expect(res.status).toEqual(200);
-    expect(res.data.tags[0]).toEqual(tag._id.toString());
+    expect(res.data.tagPermissions[0].tagId).toEqual(tag._id.toString());
   });
 
   test('Should not update user in unauthorized project', async () => {
