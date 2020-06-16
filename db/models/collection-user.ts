@@ -1,8 +1,17 @@
 import mongoose from 'mongoose';
 
+export interface TagPermission {
+  tagId: string;
+  canDownload: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
 export interface CollectionUser extends mongoose.Document {
   collectionId: string;
   userEmail: string;
+  role: 'Admin' | 'Standard' | 'SelectedTagsOnly';
+  tagPermissions?: TagPermission[];
   createdAt: number;
   updatedAt: number;
 }

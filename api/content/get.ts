@@ -4,12 +4,13 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import { APIGatewayProxyHandler } from 'aws-lambda';
+import createHttpError from 'http-errors';
 
 import { initDatabase } from '../../db/db';
 import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { getCollectionUser } from '../../utils/get-collection-user';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 
@@ -19,7 +20,7 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
-    await verifyCollection(collectionId, userEmail);
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
 
     const content = await Content.findOne({
       _id: event.pathParameters.id,
@@ -32,6 +33,19 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
         body: "Couldn't find the item to delete",
       };
     }
+
+    if (collectionUser.role === 'SelectedTagsOnly') {
+      const tagPermissions = collectionUser.tagPermissions.filter(
+        (permission) =>
+          content.tags.find((tagId) => tagId === permission.tagId) !==
+          undefined,
+      );
+
+      if (!tagPermissions || tagPermissions.length < 1) {
+        throw createHttpError(401, `User can't view this content`);
+      }
+    }
+
     return {
       statusCode: 200,
       body: JSON.stringify(content),

@@ -5,12 +5,13 @@ import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
+import createHttpError from 'http-errors';
 
 import { initDatabase } from '../../db/db';
 import { Collection } from '../../db/models/collection';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { getCollectionUser } from '../../utils/get-collection-user';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
 
 initDatabase();
 
@@ -21,8 +22,11 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const body = event.body as any;
     const userEmail = getUserEmail(event);
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
 
-    await verifyCollection(collectionId, userEmail);
+    if (collectionUser.role !== 'Admin') {
+      throw createHttpError(401, `User Role doesn't allow Collection updates`);
+    }
 
     await Collection.updateOne(
       {

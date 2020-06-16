@@ -9,7 +9,7 @@ import { initDatabase } from '../../db/db';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { Tag } from '../../db/models/tag';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
 
 initDatabase();
 
@@ -19,10 +19,23 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
-    await verifyCollection(collectionId, userEmail);
-    const content = await Tag.find({
-      collectionId,
-    });
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
+
+    let content;
+
+    if (collectionUser.role === 'SelectedTagsOnly') {
+      const tagsId = collectionUser.tagPermissions.map((t) => t.tagId);
+      content = await Tag.find({
+        collectionId,
+        _id: {
+          $in: tagsId,
+        },
+      });
+    } else {
+      content = await Tag.find({
+        collectionId,
+      });
+    }
 
     return {
       statusCode: 200,

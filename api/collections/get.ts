@@ -9,7 +9,7 @@ import { initDatabase } from '../../db/db';
 import { Collection } from '../../db/models/collection';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
 
 initDatabase();
 
@@ -19,7 +19,7 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const userEmail = getUserEmail(event);
-    await verifyCollection(collectionId, userEmail);
+    await getCollectionUser(collectionId, userEmail);
 
     const collection = await Collection.findById(collectionId);
 

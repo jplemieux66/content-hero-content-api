@@ -10,7 +10,8 @@ import { initDatabase } from '../../db/db';
 import { CollectionUser } from '../../db/models/collection-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
+import createHttpError from 'http-errors';
 
 initDatabase();
 
@@ -20,7 +21,14 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const requestUserEmail = getUserEmail(event);
-    await verifyCollection(collectionId, requestUserEmail);
+    const requestCollectionUser = await getCollectionUser(
+      collectionId,
+      requestUserEmail,
+    );
+
+    if (requestCollectionUser.role !== 'Admin') {
+      throw createHttpError(401, `User Role doesn't allow user creation`);
+    }
 
     const body = event.body as any;
 

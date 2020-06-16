@@ -10,7 +10,8 @@ import { initDatabase } from '../../db/db';
 import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
+import createHttpError from 'http-errors';
 
 initDatabase();
 
@@ -21,15 +22,12 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
     const body = event.body as any;
     const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
-    await verifyCollection(collectionId, userEmail);
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
 
-    let item = await Content.findOneAndUpdate(
-      {
-        _id: event.pathParameters.id,
-        collectionId,
-      },
-      body,
-    );
+    let item = await Content.findOne({
+      _id: event.pathParameters.id,
+      collectionId,
+    });
 
     if (!item) {
       return {
@@ -38,6 +36,27 @@ const update: APIGatewayProxyHandler = async (event, _context) => {
         body: "Couldn't find the item to delete",
       };
     }
+
+    if (collectionUser.role === 'SelectedTagsOnly') {
+      const tagPermissions = collectionUser.tagPermissions.filter(
+        (permission) =>
+          item.tags.find((tagId) => tagId === permission.tagId) !== undefined,
+      );
+      const canEdit =
+        tagPermissions.find((permission) => permission.canEdit) !== undefined;
+
+      if (!canEdit) {
+        throw createHttpError(401, `User can't edit this content`);
+      }
+    }
+
+    await Content.updateOne(
+      {
+        _id: event.pathParameters.id,
+        collectionId,
+      },
+      body,
+    );
 
     item = await Content.findById(item._id);
 

@@ -9,7 +9,8 @@ import { initDatabase } from '../../db/db';
 import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
+import createHttpError from 'http-errors';
 
 initDatabase();
 
@@ -19,7 +20,17 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
-    await verifyCollection(collectionId, userEmail);
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
+
+    if (collectionUser.role === 'SelectedTagsOnly') {
+      const isAllowed =
+        collectionUser.tagPermissions.find(
+          (p) => p.tagId === event.pathParameters.id,
+        ) !== undefined;
+      if (!isAllowed) {
+        throw createHttpError(401, `Unauthorized`);
+      }
+    }
 
     const tag = await Tag.findOne({
       _id: event.pathParameters.id,

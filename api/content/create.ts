@@ -10,7 +10,8 @@ import { initDatabase } from '../../db/db';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { Content } from '../../db/models/content';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
+import createHttpError from 'http-errors';
 
 initDatabase();
 
@@ -21,7 +22,11 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
     const body = event.body as any;
     const collectionId = event.pathParameters.collectionId;
     const userEmail = getUserEmail(event);
-    await verifyCollection(collectionId, userEmail);
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
+
+    if (collectionUser.role !== 'Admin' && collectionUser.role !== 'Standard') {
+      throw createHttpError(401, `User Role doesn't allow Content creation`);
+    }
 
     const item = await new Content({
       ...body,

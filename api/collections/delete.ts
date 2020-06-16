@@ -11,9 +11,10 @@ import { Collection } from '../../db/models/collection';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { CollectionUser } from '../../db/models/collection-user';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
 import { Content } from '../../db/models/content';
 import { Tag } from '../../db/models/tag';
+import createHttpError from 'http-errors';
 
 initDatabase();
 
@@ -23,8 +24,11 @@ const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
 
   try {
     const userEmail = getUserEmail(event);
+    const collectionUser = await getCollectionUser(collectionId, userEmail);
 
-    await verifyCollection(collectionId, userEmail);
+    if (collectionUser.role !== 'Admin') {
+      throw createHttpError(401, `User Role doesn't allow Collection deletion`);
+    }
 
     await Promise.all([
       Collection.deleteOne({

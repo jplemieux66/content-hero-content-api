@@ -10,7 +10,8 @@ import { initDatabase } from '../../db/db';
 import { CollectionUser } from '../../db/models/collection-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
-import { verifyCollection } from '../../utils/verify-collection';
+import { getCollectionUser } from '../../utils/get-collection-user';
+import createHttpError from 'http-errors';
 
 initDatabase();
 
@@ -22,8 +23,14 @@ const updateUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const body = event.body as any;
     const requestUserEmail = getUserEmail(event);
+    const requestCollectionUser = await getCollectionUser(
+      collectionId,
+      requestUserEmail,
+    );
 
-    await verifyCollection(collectionId, requestUserEmail);
+    if (requestCollectionUser.role !== 'Admin') {
+      throw createHttpError(401, `User Role doesn't allow user deletion`);
+    }
 
     await CollectionUser.updateOne(
       {
