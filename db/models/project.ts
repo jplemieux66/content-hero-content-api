@@ -23,7 +23,6 @@ const ProjectSchema = new mongoose.Schema(
     },
     createdBy: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true },

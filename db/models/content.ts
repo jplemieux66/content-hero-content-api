@@ -99,7 +99,6 @@ const ContentSchema = new mongoose.Schema(
     },
     createdBy: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true },
