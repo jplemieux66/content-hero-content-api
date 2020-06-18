@@ -5,6 +5,7 @@ export interface Project extends mongoose.Document {
   description: string;
   createdAt: number;
   updatedAt: number;
+  createdBy: string;
   userEmails?: string[];
 }
 
@@ -19,6 +20,10 @@ const ProjectSchema = new mongoose.Schema(
     },
     userEmails: {
       type: [String],
+    },
+    createdBy: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true },

@@ -23,6 +23,7 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
   try {
     const project = new Project({
       ...body,
+      createdBy: userEmail,
     });
     await project.save();
 

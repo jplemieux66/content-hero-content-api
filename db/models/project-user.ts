@@ -14,6 +14,7 @@ export interface ProjectUser extends mongoose.Document {
   tagPermissions?: TagPermission[];
   createdAt: number;
   updatedAt: number;
+  createdBy: string;
 }
 
 const TagPermissionSchema = new mongoose.Schema({
@@ -52,6 +53,9 @@ const ProjectUserSchema = new mongoose.Schema(
     },
     tagPermissions: {
       type: [TagPermissionSchema],
+    },
+    createdBy: {
+      type: String,
     },
   },
   { timestamps: true },

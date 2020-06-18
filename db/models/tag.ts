@@ -4,6 +4,7 @@ export interface Tag extends mongoose.Document {
   _id: string;
   name: string;
   description: string;
+  createdBy: string;
 }
 
 const TagSchema = new mongoose.Schema(
@@ -16,6 +17,10 @@ const TagSchema = new mongoose.Schema(
       type: String,
     },
     projectId: {
+      type: String,
+      required: true,
+    },
+    createdBy: {
       type: String,
       required: true,
     },

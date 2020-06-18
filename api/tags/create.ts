@@ -41,6 +41,7 @@ const create: APIGatewayProxyHandler = async (event, _context) => {
     const item = await new Tag({
       ...body,
       projectId,
+      createdBy: userEmail,
     });
     await item.save();
     return {

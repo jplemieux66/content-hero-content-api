@@ -49,6 +49,7 @@ const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
 
     const projectUser = new ProjectUser({
       projectId,
+      createdBy: requestUserEmail,
       ...body,
     });
     await projectUser.save();
