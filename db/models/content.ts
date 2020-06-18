@@ -43,6 +43,7 @@ export interface Content extends mongoose.Document {
   createdAt: number;
   updatedAt: number;
   createdBy: string;
+  acknowledged: boolean;
 }
 
 const ContentSchema = new mongoose.Schema(
@@ -96,6 +97,10 @@ const ContentSchema = new mongoose.Schema(
     projectId: {
       type: String,
       required: true,
+    },
+    acknowledged: {
+      type: Boolean,
+      default: false,
     },
     createdBy: {
       type: String,
