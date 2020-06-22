@@ -44,6 +44,7 @@ export interface Content extends mongoose.Document {
   updatedAt: number;
   createdBy: string;
   acknowledged: boolean;
+  downloadedBy?: string[];
 }
 
 const ContentSchema = new mongoose.Schema(
@@ -102,6 +103,10 @@ const ContentSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    downloadedBy: {
+      type: [String],
+      default: [],
+    },
     createdBy: {
       type: String,
     },
@@ -113,3 +118,10 @@ const ContentSchema = new mongoose.Schema(
   (global as any).Content || mongoose.model('Content', ContentSchema);
 
 export const Content = (global as any).Content as mongoose.Model<Content>;
+
+export const getParsedContent = (content) => {
+  return {
+    ...content,
+    downloadedBy: undefined,
+  };
+};
