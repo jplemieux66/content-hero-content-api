@@ -12,7 +12,7 @@ custom:
 # Add the serverless-webpack plugin
 plugins:
   - serverless-dotenv-plugin
-  - serverless-webpack
+  - serverless-jetpack
   - serverless-offline
 
 provider:
@@ -28,10 +28,14 @@ provider:
       Action:
         - 'ses:*'
       Resource: '*'
+    - Effect: 'Allow'
+      Action:
+        - 's3:*'
+      Resource: 'arn:aws:s3:::${env:S3_BUCKET}/*'
 
 functions:
   delete-all:
-    handler: api/delete-all.handler
+    handler: .webpack/delete-all.handler
     events:
       - http:
           path: all
@@ -40,7 +44,7 @@ functions:
 
   # Content API
   content-create:
-    handler: api/content/create.handler
+    handler: .webpack/content/create.handler
     events:
       - http:
           path: /projects/{projectId}/content
@@ -48,7 +52,7 @@ functions:
           cors: true
 
   content-list:
-    handler: api/content/list.handler
+    handler: .webpack/content/list.handler
     events:
       - http:
           path: /projects/{projectId}/content
@@ -56,7 +60,7 @@ functions:
           cors: true
 
   content-get:
-    handler: api/content/get.handler
+    handler: .webpack/content/get.handler
     events:
       - http:
           path: /projects/{projectId}/content/{id}
@@ -64,7 +68,7 @@ functions:
           cors: true
 
   content-update:
-    handler: api/content/update.handler
+    handler: .webpack/content/update.handler
     events:
       - http:
           path: /projects/{projectId}/content/{id}
@@ -72,7 +76,7 @@ functions:
           cors: true
 
   content-delete:
-    handler: api/content/delete.handler
+    handler: .webpack/content/delete.handler
     events:
       - http:
           path: /projects/{projectId}/content/{id}
@@ -81,7 +85,7 @@ functions:
 
   # Tags API
   tag-create:
-    handler: api/tags/create.handler
+    handler: .webpack/tags/create.handler
     events:
       - http:
           path: /projects/{projectId}/tags
@@ -89,7 +93,7 @@ functions:
           cors: true
 
   tags-list:
-    handler: api/tags/list.handler
+    handler: .webpack/tags/list.handler
     events:
       - http:
           path: /projects/{projectId}/tags
@@ -97,7 +101,7 @@ functions:
           cors: true
 
   tags-get:
-    handler: api/tags/get.handler
+    handler: .webpack/tags/get.handler
     events:
       - http:
           path: /projects/{projectId}/tags/{id}
@@ -105,7 +109,7 @@ functions:
           cors: true
 
   tags-update:
-    handler: api/tags/update.handler
+    handler: .webpack/tags/update.handler
     events:
       - http:
           path: /projects/{projectId}/tags/{id}
@@ -113,7 +117,7 @@ functions:
           cors: true
 
   tags-delete:
-    handler: api/tags/delete.handler
+    handler: .webpack/tags/delete.handler
     events:
       - http:
           path: /projects/{projectId}/tags/{id}
@@ -122,7 +126,7 @@ functions:
 
   # Projects API
   projects-create:
-    handler: api/projects/create.handler
+    handler: .webpack/projects/create.handler
     events:
       - http:
           path: projects
@@ -130,7 +134,7 @@ functions:
           cors: true
 
   projects-list:
-    handler: api/projects/list.handler
+    handler: .webpack/projects/list.handler
     events:
       - http:
           path: projects
@@ -138,7 +142,7 @@ functions:
           cors: true
 
   projects-get:
-    handler: api/projects/get.handler
+    handler: .webpack/projects/get.handler
     events:
       - http:
           path: projects/{projectId}
@@ -146,7 +150,7 @@ functions:
           cors: true
 
   projects-update:
-    handler: api/projects/update.handler
+    handler: .webpack/projects/update.handler
     events:
       - http:
           path: projects/{projectId}
@@ -154,7 +158,7 @@ functions:
           cors: true
 
   projects-delete:
-    handler: api/projects/delete.handler
+    handler: .webpack/projects/delete.handler
     events:
       - http:
           path: projects/{projectId}
@@ -163,7 +167,7 @@ functions:
 
   # Users API
   user-create:
-    handler: api/users/create.handler
+    handler: .webpack/users/create.handler
     events:
       - http:
           path: /projects/{projectId}/users
@@ -171,7 +175,7 @@ functions:
           cors: true
 
   users-list:
-    handler: api/users/list.handler
+    handler: .webpack/users/list.handler
     events:
       - http:
           path: /projects/{projectId}/users
@@ -179,7 +183,7 @@ functions:
           cors: true
 
   users-update:
-    handler: api/users/update.handler
+    handler: .webpack/users/update.handler
     events:
       - http:
           path: /projects/{projectId}/users/{id}
@@ -187,7 +191,7 @@ functions:
           cors: true
 
   users-delete:
-    handler: api/users/delete.handler
+    handler: .webpack/users/delete.handler
     events:
       - http:
           path: /projects/{projectId}/users/{id}
@@ -196,7 +200,7 @@ functions:
 
   # Uploads API
   request-upload-url:
-    handler: api/uploads/request-upload-url.handler
+    handler: .webpack/uploads/request-upload-url.handler
     events:
       - http:
           path: /request-upload-url
@@ -204,8 +208,7 @@ functions:
           cors: true
 
   process-video:
-    handler: api/uploads/process-video.handler
-    timeout: 900
+    handler: .webpack/uploads/process-video.handler
     layers:
       - ${cf:content-hero-lambda-layers-dev.FfmpegLayerExport}
     package:
@@ -218,7 +221,7 @@ functions:
           async: true
 
   process-photo:
-    handler: api/uploads/process-photo.handler
+    handler: .webpack/uploads/process-photo.handler
     package:
       individually: true
     events:
@@ -229,7 +232,7 @@ functions:
           async: true
 
   create-file-upload:
-    handler: api/uploads/create.handler
+    handler: .webpack/uploads/create.handler
     events:
       - http:
           path: projects/{projectId}/uploads
@@ -237,7 +240,7 @@ functions:
           cors: true
 
   update-file-upload:
-    handler: api/uploads/update.handler
+    handler: .webpack/uploads/update.handler
     events:
       - http:
           path: projects/{projectId}/uploads/{id}
@@ -245,7 +248,7 @@ functions:
           cors: true
 
   list-file-uploads:
-    handler: api/uploads/list.handler
+    handler: .webpack/uploads/list.handler
     events:
       - http:
           path: projects/{projectId}/uploads/
@@ -253,7 +256,7 @@ functions:
           cors: true
 
   delete-file-upload:
-    handler: api/uploads/delete.handler
+    handler: .webpack/uploads/delete.handler
     events:
       - http:
           path: projects/{projectId}/uploads/{id}
@@ -261,7 +264,7 @@ functions:
           cors: true
 
   delete-file-uploads-for-user:
-    handler: api/uploads/delete-for-user.handler
+    handler: .webpack/uploads/delete-for-user.handler
     events:
       - http:
           path: projects/{projectId}/uploads/

@@ -4,6 +4,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Serverless Offline",
+      "preLaunchTask": "build",
       "program": "${workspaceFolder}/node_modules/serverless/bin/serverless",
       "args": [
         "offline",
