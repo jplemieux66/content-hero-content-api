@@ -28,24 +28,33 @@
     "@middy/http-json-body-parser": "^1.0.0",
     "aws-sdk": "^2.673.0",
     "debug": "^4.1.1",
+    "fluent-ffmpeg": "^2.1.2",
     "http-errors": "^1.7.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.15",
+    "rollbar": "^2.17.0",
     "serverless-dotenv-plugin": "^2.4.2",
+    "sharp": "^0.25.2",
     "source-map-support": "^0.5.10",
     "uuid": "^8.0.0",
     "validator": "^13.0.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",
+    "@types/fluent-ffmpeg": "^2.1.14",
     "@types/jest": "^25.2.3",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.7.21",
     "@types/node": "^10.12.18",
     "@types/uuid": "^7.0.3",
+    "@types/sharp": "^0.25.0",
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
     "fork-ts-checker-webpack-plugin": "^3.0.1",
     "jest": "^26.0.1",
     "jest-runner-groups": "^2.0.1",
+    "moment": "^2.26.0",
+    "querystring": "^0.2.0",
     "serverless": "^1.70.1",
     "serverless-offline": "^6.1.5",
     "serverless-webpack": "^5.2.0",
@@ -55,5 +64,5 @@
     "webpack": "^4.29.0",
     "webpack-node-externals": "^1.7.2"
   },
-  "author": "Content Hero"
+  "author": "Content Star"
 }

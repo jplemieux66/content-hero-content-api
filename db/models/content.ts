@@ -32,12 +32,14 @@ export interface Content extends mongoose.Document {
   fileName: string;
   fileType: string;
   fileSize: string;
-  s3ContentId: string;
-  s3ContentURL: string;
-  width: number;
-  height: number;
-  duration: string;
-  thumbnails: ContentThumbnail[];
+  status: 'Pending' | 'Ready' | 'Error';
+  statusError: string;
+  s3ContentId?: string;
+  s3ContentURL?: string;
+  width?: number;
+  height?: number;
+  duration?: string;
+  thumbnails?: ContentThumbnail[];
   tags: string[];
   projectId: string;
   createdAt: number;
@@ -93,7 +95,7 @@ const ContentSchema = new mongoose.Schema(
     },
     tags: {
       type: [String],
-      required: true,
+      default: [],
     },
     projectId: {
       type: String,
