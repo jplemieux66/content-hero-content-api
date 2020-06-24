@@ -8,7 +8,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AuthMiddleware } from '../../../content-management/utils/auth-middleware';
+import { AuthMiddleware } from '../../utils/auth-middleware';
 
 const internalHandler: APIGatewayProxyHandler = async (event, _context) => {
   const { extension, type } = event.body as any;
