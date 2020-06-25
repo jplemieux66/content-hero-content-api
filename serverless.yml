@@ -217,7 +217,7 @@ functions:
         - ./**
       include:
         - .webpack/uploads/process-video.*
-        - node_modules/**
+
     events:
       - http:
           path: /projects/{projectId}/uploads/process-video
@@ -233,8 +233,6 @@ functions:
         - ./**
       include:
         - .webpack/uploads/process-photo.*
-        - node_modules/**
-
     events:
       - http:
           path: /projects/{projectId}/uploads/process-photo
