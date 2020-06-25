@@ -1,20 +1,15 @@
 const path = require('path');
+const slsw = require('serverless-webpack');
 const nodeExternals = require('webpack-node-externals');
-var glob = require('glob');
-
-const entries = {};
-glob.sync('./api/**/*.ts').map((path) => {
-  path = path.replace('.ts', '');
-  const key = path.replace('./api/', '');
-  entries[key] = path;
-});
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   context: __dirname,
-  entry: entries,
+  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
+  entry: slsw.lib.entries,
   devtool: 'source-map',
   resolve: {
-    extensions: ['.json', '.ts'],
+    extensions: ['.mjs', '.json', '.ts'],
     symlinks: false,
     cacheWithContext: false,
   },
@@ -22,7 +17,6 @@ module.exports = {
     libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
     filename: '[name].js',
-    sourceMapFilename: '[name].js.map',
   },
   target: 'node',
   externals: [nodeExternals()],
@@ -46,4 +40,12 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    // new ForkTsCheckerWebpackPlugin({
+    //   eslint: true,
+    //   eslintOptions: {
+    //     cache: true
+    //   }
+    // })
+  ],
 };
