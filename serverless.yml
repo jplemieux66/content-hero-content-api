@@ -213,11 +213,6 @@ functions:
       - ${cf:content-hero-lambda-layers-dev.FfmpegLayerExport}
     package:
       individually: true
-      exclude:
-        - ./**
-      include:
-        - .webpack/uploads/process-video.*
-
     events:
       - http:
           path: /projects/{projectId}/uploads/process-video
@@ -229,10 +224,6 @@ functions:
     handler: .webpack/uploads/process-photo.handler
     package:
       individually: true
-      exclude:
-        - ./**
-      include:
-        - .webpack/uploads/process-photo.*
     events:
       - http:
           path: /projects/{projectId}/uploads/process-photo
