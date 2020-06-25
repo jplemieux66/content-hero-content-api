@@ -9,6 +9,8 @@ export const initDatabase = () => {
       useNewUrlParser: true,
       useCreateIndex: true,
       useFindAndModify: false,
+      useUnifiedTopology: true,
+      poolSize: 10,
     },
   );
 };
