@@ -7,12 +7,11 @@ import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import createHttpError from 'http-errors';
 
-import { initDatabase } from '../../db/db';
 import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { DbMiddleware } from '../../utils/db-middleware';
 import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
-import { DbMiddleware } from '../../utils/db-middleware';
 
 const create: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
