@@ -5,18 +5,17 @@ import cors from '@middy/http-cors';
 import httpErrorHandler from '@middy/http-error-handler';
 import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
+import createHttpError from 'http-errors';
 
 import { initDatabase } from '../../db/db';
 import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
-import { getUserEmail } from '../../utils/get-user-email';
+import { DbMiddleware } from '../../utils/db-middleware';
 import { getProjectUser } from '../../utils/get-project-user';
-import createHttpError from 'http-errors';
+import { getUserEmail } from '../../utils/get-user-email';
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
-
   try {
     const projectId = event.pathParameters.projectId;
     const userEmail = getUserEmail(event);
@@ -60,4 +59,5 @@ export const handler = middy(deleteHandler)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

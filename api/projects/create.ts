@@ -11,11 +11,10 @@ import { Project } from '../../db/models/project';
 import { ProjectUser } from '../../db/models/project-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
+import { DbMiddleware } from '../../utils/db-middleware';
 
 const create: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
-
   const body = event.body as any;
   const userEmail = getUserEmail(event);
 
@@ -51,4 +50,5 @@ export const handler = middy(create)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

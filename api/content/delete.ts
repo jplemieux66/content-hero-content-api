@@ -8,9 +8,9 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 import createHttpError from 'http-errors';
 
-import { initDatabase } from '../../db/db';
 import { Content } from '../../db/models/content';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { DbMiddleware } from '../../utils/db-middleware';
 import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
@@ -18,7 +18,6 @@ const s3 = new AWS.S3();
 
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
 
   try {
     const projectId = event.pathParameters.projectId;
@@ -92,4 +91,5 @@ export const handler = middy(deleteHandler)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

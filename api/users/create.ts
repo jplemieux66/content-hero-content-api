@@ -14,11 +14,10 @@ import { getProjectUser } from '../../utils/get-project-user';
 import createHttpError from 'http-errors';
 import { sendInvitationEmail } from '../../utils/send-invitation-email';
 import { Project } from '../../db/models/project';
+import { DbMiddleware } from '../../utils/db-middleware';
 
 const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
-
   const projectId = event.pathParameters.projectId;
 
   try {
@@ -76,4 +75,5 @@ export const handler = middy(addUserHandler)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

@@ -10,10 +10,10 @@ import { ProjectUser } from '../../db/models/project-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 import { Project } from '../../db/models/project';
+import { DbMiddleware } from '../../utils/db-middleware';
 
 const list: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
 
   try {
     const userEmail = getUserEmail(event);
@@ -43,4 +43,5 @@ const list: APIGatewayProxyHandler = async (event, _context) => {
 export const handler = middy(list)
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

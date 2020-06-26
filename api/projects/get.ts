@@ -8,13 +8,12 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { initDatabase } from '../../db/db';
 import { Project } from '../../db/models/project';
 import { AuthMiddleware } from '../../utils/auth-middleware';
-import { getUserEmail } from '../../utils/get-user-email';
+import { DbMiddleware } from '../../utils/db-middleware';
 import { getProjectUser } from '../../utils/get-project-user';
+import { getUserEmail } from '../../utils/get-user-email';
 
 const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
-
   const projectId = event.pathParameters.projectId;
 
   try {
@@ -40,4 +39,5 @@ const getHandler: APIGatewayProxyHandler = async (event, _context) => {
 export const handler = middy(getHandler)
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

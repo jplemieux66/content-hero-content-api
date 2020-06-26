@@ -8,17 +8,16 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import * as AWS from 'aws-sdk';
 
 import { initDatabase } from '../db/db';
-import { AuthMiddleware } from '../utils/auth-middleware';
-import { getUserEmail } from '../utils/get-user-email';
 import { Content } from '../db/models/content';
 import { Tag } from '../db/models/tag';
+import { AuthMiddleware } from '../utils/auth-middleware';
+import { DbMiddleware } from '../utils/db-middleware';
+import { getUserEmail } from '../utils/get-user-email';
 
 const s3 = new AWS.S3();
 
 const deleteAllHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
-
   try {
     const userEmail = getUserEmail(event);
     const content = await Content.find({
@@ -72,4 +71,5 @@ export const handler = middy(deleteAllHandler)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());

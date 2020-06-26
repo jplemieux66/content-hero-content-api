@@ -10,13 +10,12 @@ import createHttpError from 'http-errors';
 import { initDatabase } from '../../db/db';
 import { Project } from '../../db/models/project';
 import { AuthMiddleware } from '../../utils/auth-middleware';
+import { DbMiddleware } from '../../utils/db-middleware';
 import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
 const update: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
-  await initDatabase();
-
   const projectId = event.pathParameters.projectId;
 
   try {
@@ -55,4 +54,5 @@ export const handler = middy(update)
   .use(jsonBodyParser())
   .use(httpErrorHandler())
   .use(new AuthMiddleware())
+  .use(new DbMiddleware())
   .use(cors());
