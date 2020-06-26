@@ -12,10 +12,9 @@ import { getUserEmail } from '../../utils/get-user-email';
 import { getProjectUser } from '../../utils/get-project-user';
 import createHttpError from 'http-errors';
 
-initDatabase();
-
 const getHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
 
   try {
     const projectId = event.pathParameters.projectId;

@@ -13,10 +13,10 @@ import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getProjectUser } from '../../utils/get-project-user';
 import { getUserEmail } from '../../utils/get-user-email';
 
-initDatabase();
-
 const update: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
+
   const projectId = event.pathParameters.projectId;
 
   try {

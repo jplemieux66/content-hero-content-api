@@ -11,10 +11,9 @@ import { getUserEmail } from '../../utils/get-user-email';
 import { Tag } from '../../db/models/tag';
 import { getProjectUser } from '../../utils/get-project-user';
 
-initDatabase();
-
 const list: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
 
   try {
     const projectId = event.pathParameters.projectId;

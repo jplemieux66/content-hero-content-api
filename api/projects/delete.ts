@@ -16,10 +16,10 @@ import { Content } from '../../db/models/content';
 import { Tag } from '../../db/models/tag';
 import createHttpError from 'http-errors';
 
-initDatabase();
-
 const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
+
   const projectId = event.pathParameters.projectId;
 
   try {

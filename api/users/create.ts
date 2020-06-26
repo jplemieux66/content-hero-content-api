@@ -15,10 +15,10 @@ import createHttpError from 'http-errors';
 import { sendInvitationEmail } from '../../utils/send-invitation-email';
 import { Project } from '../../db/models/project';
 
-initDatabase();
-
 const addUserHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
+
   const projectId = event.pathParameters.projectId;
 
   try {

@@ -13,11 +13,11 @@ import { getUserEmail } from '../utils/get-user-email';
 import { Content } from '../db/models/content';
 import { Tag } from '../db/models/tag';
 
-initDatabase();
 const s3 = new AWS.S3();
 
 const deleteAllHandler: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
 
   try {
     const userEmail = getUserEmail(event);

@@ -12,10 +12,9 @@ import { ProjectUser } from '../../db/models/project-user';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { getUserEmail } from '../../utils/get-user-email';
 
-initDatabase();
-
 const create: APIGatewayProxyHandler = async (event, _context) => {
   _context.callbackWaitsForEmptyEventLoop = false;
+  await initDatabase();
 
   const body = event.body as any;
   const userEmail = getUserEmail(event);
