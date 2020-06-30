@@ -44,6 +44,7 @@ export interface Content extends mongoose.Document {
   updatedAt: number;
   createdBy: string;
   acknowledged: boolean;
+  fileUploadId: string;
   downloadedBy?: string[];
 }
 
@@ -106,6 +107,10 @@ const ContentSchema = new mongoose.Schema(
     downloadedBy: {
       type: [String],
       default: [],
+    },
+    fileUploadId: {
+      type: String,
+      required: true,
     },
     createdBy: {
       type: String,
