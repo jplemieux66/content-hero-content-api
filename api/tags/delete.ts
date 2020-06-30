@@ -7,7 +7,6 @@ import jsonBodyParser from '@middy/http-json-body-parser';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import createHttpError from 'http-errors';
 
-import { initDatabase } from '../../db/db';
 import { Tag } from '../../db/models/tag';
 import { AuthMiddleware } from '../../utils/auth-middleware';
 import { DbMiddleware } from '../../utils/db-middleware';

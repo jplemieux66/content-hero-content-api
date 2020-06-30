@@ -71,6 +71,14 @@ functions:
           method: patch
           cors: true
 
+  content-update-multiple:
+    handler: api/content/update-multiple.handler
+    events:
+      - http:
+          path: /projects/{projectId}/content
+          method: patch
+          cors: true
+
   content-delete:
     handler: api/content/delete.handler
     events:
