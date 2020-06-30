@@ -110,7 +110,7 @@ const ContentSchema = new mongoose.Schema(
     },
     fileUploadId: {
       type: String,
-      required: true,
+      // required: true,
     },
     createdBy: {
       type: String,
